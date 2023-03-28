@@ -8,4 +8,10 @@
         <attr name="disable" format="boolean" /><!--是否禁用-->
         <attr name="btnBackground" format="reference" /><!--背景图-->
     </declare-styleable>
+
+    <declare-styleable name="LoginPageView">
+        <attr name="mainColor" format="color" />
+        <attr name="verifyCodeLength" format="integer" />
+        <attr name="protoclUrl" format="string" />
+    </declare-styleable>
 </resources>

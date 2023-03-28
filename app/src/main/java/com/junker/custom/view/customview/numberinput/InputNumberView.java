@@ -1,4 +1,4 @@
-package com.junker.custom.view.customview;
+package com.junker.custom.view.customview.numberinput;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -8,9 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import androidx.appcompat.view.menu.ActionMenuItemView;
 
 import com.junker.custom.view.R;
 

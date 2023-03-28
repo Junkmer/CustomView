@@ -2,10 +2,13 @@ package com.junker.custom.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
-import com.junker.custom.view.customview.InputNumberView;
+import com.junker.custom.view.customview.loginpage.LoginKeyboard;
+import com.junker.custom.view.customview.numberinput.InputNumberView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,6 +20,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
+    }
+
+    private void initView(){
         mInputNumberView = this.findViewById(R.id.input_number_view);
         mInputNumberView.setOnNumberChangeListener(new InputNumberView.OnNumberChangeListener() {
             @Override
@@ -34,5 +41,10 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG,"min value is == > "+value);
             }
         });
+    }
+
+    public void loginBtn(View view){
+        Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+        startActivity(intent);
     }
 }
