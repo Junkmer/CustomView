@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="InputNumberView">
+        <attr name="max" format="integer" /> <!--最大值-->
+        <attr name="min" format="integer" /><!--最小值-->
+        <attr name="defaultValue" format="integer" /><!--默认值-->
+        <attr name="step" format="integer" /><!--加减计数单位-->
+        <attr name="disable" format="boolean" /><!--是否禁用-->
+        <attr name="btnBackground" format="reference" /><!--背景图-->
+    </declare-styleable>
+</resources>
