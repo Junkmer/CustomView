@@ -1,25 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/login_page_view_layout"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:background="@color/black"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#dddddd"
+    android:paddingStart="40dp"
+    android:paddingEnd="40dp">
 
     <TextView
+        android:id="@+id/login_title"
         android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:drawablePadding="10dp"
+        android:gravity="center"
+        android:text="神秘百宝箱账号登录"
+        android:textColor="@color/black"
         android:textSize="18sp"
-        android:textColor="#fff"
-        android:layout_height="wrap_content"
-        android:text="神秘百宝箱账号登录"/>
+        app:drawableStartCompat="@mipmap/icon_title" />
 
     <EditText
+        android:id="@+id/input_phone_num"
         android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/login_title"
         android:layout_marginTop="30dp"
-        android:background="@color/white"
+        android:background="@drawable/shape_input_bg"
+        android:drawableStart="@mipmap/icon_tel"
+        android:drawablePadding="10dp"
         android:hint="请输入11位手机号码"
-        android:layout_height="50dp"/>
+        android:inputType="phone"
+        android:maxLength="11"
+        android:paddingStart="15dp"
+        android:textCursorDrawable="@drawable/shape_edt_cursor" />
 
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/layout_verify_code"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/input_phone_num"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/shape_input_bg"
+        android:paddingLeft="15dp">
+
+        <EditText
+            android:id="@+id/input_verify_code"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="#0000"
+            android:drawableStart="@mipmap/icon_verify_code"
+            android:drawablePadding="10dp"
+            android:hint="请输入验证码"
+            android:inputType="number"
+            android:textCursorDrawable="@drawable/shape_edt_cursor" />
+
+        <TextView
+            android:id="@+id/get_verify_code"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:paddingEnd="20dp"
+            android:text="获取验证码"
+            android:textColor="@drawable/selector_text_color" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toLeftOf="@+id/get_verify_code"
+            android:background="@drawable/shape_line_bg" />
+    </RelativeLayout>
+
+    <CheckBox
+        android:id="@+id/check_protocol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_verify_code"
+        android:layout_marginTop="20dp"
+        android:buttonTint="@drawable/selector_text_color" />
+
+    <TextView
+        android:id="@+id/check_protocol_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/check_protocol"
+        android:layout_alignBottom="@id/check_protocol"
+        android:layout_toRightOf="@id/check_protocol"
+        android:gravity="center_vertical"
+        android:text="同意《神秘百宝箱用户使用协议》"
+        android:textColor="@drawable/selector_text_color"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/login_btn"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/check_protocol"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/selector_login_btn_bg"
+        android:gravity="center"
+        android:text="登录"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <com.junker.custom.view.customview.loginpage.LoginKeyboard
+        android:id="@+id/login_key_board"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp" />
+
+</RelativeLayout>

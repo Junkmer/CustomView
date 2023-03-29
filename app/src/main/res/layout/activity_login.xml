@@ -6,12 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
 
-    <com.junker.custom.view.customview.loginpage.LoginKeyboard
-        android:id="@+id/login_key_board"
+    <com.junker.custom.view.customview.loginpage.LoginPageView
+        android:id="@+id/login_page_view"
         android:layout_width="match_parent"
-        android:layout_height="240dp"
+        android:layout_height="match_parent"
         junker:layout_constraintBottom_toBottomOf="parent"
         junker:layout_constraintEnd_toEndOf="parent"
-        junker:layout_constraintStart_toStartOf="parent"/>
+        junker:layout_constraintStart_toStartOf="parent"
+        junker:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

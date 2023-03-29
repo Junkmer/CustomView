@@ -12,6 +12,6 @@
     <declare-styleable name="LoginPageView">
         <attr name="mainColor" format="color" />
         <attr name="verifyCodeLength" format="integer" />
-        <attr name="protoclUrl" format="string" />
+        <attr name="protocolUrl" format="string" />
     </declare-styleable>
 </resources>
