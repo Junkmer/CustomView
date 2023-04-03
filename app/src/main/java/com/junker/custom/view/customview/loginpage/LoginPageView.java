@@ -3,6 +3,7 @@ package com.junker.custom.view.customview.loginpage;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -25,11 +26,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.junker.custom.view.R;
-import com.junker.custom.view.customview.numberinput.InputNumberView;
 
 import java.lang.reflect.Field;
 import java.util.regex.Pattern;
-import java.util.zip.Inflater;
 
 /**
  * 点击获取验证码 --> 条件手机号码正确
@@ -41,7 +40,6 @@ public class LoginPageView extends FrameLayout {
     private static final String TAG = LoginPageView.class.getSimpleName();
     private int mColor;
     private int mVerifyCodeLength = SIZE_VERIFY_CODE_DEFAULT;
-    private String mProtocolUrl;
     private OnLoginPageActionListener mOnLoginPageActionListener = null;
     private LoginKeyboard loginKeyboard;
     private EditText inputPhoneNum;
@@ -53,6 +51,35 @@ public class LoginPageView extends FrameLayout {
     private boolean isVerifyCodeOk = false;
     private TextView getVerifyCode;
     private TextView loginBtn;
+
+    private boolean isCountDowmTimer = false;
+    private final static int DEFAULT_MILLIS_IN_FUTURE = 60 * 1000;
+    private final static int DEFAULT_COUNT_DOWN_INTERVAL = 1000;
+    //倒计时总时间 单位：毫秒
+    private long totalDuration = DEFAULT_MILLIS_IN_FUTURE;
+    //倒计时时间间隔 单位：毫秒
+    private long dTime = DEFAULT_COUNT_DOWN_INTERVAL;
+    //当前倒计时
+    private long currentDownTimer = totalDuration;
+
+    private void beginDownTimer() {
+        isCountDowmTimer = true;
+        getVerifyCode.setEnabled(false);
+        new CountDownTimer(totalDuration, dTime) {
+
+            public void onTick(long millisUntilFinished) {
+                int res = (int) (millisUntilFinished/1000);
+                getVerifyCode.setText(String.format("(%s秒)", res));
+            }
+
+            public void onFinish() {
+                isCountDowmTimer = false;
+                getVerifyCode.setEnabled(true);
+                getVerifyCode.setText("获取验证码");
+                updateAllBtnState();
+            }
+        }.start();
+    }
 
     public LoginPageView(@NonNull Context context) {
         this(context, null);
@@ -111,10 +138,11 @@ public class LoginPageView extends FrameLayout {
         getVerifyCode.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mOnLoginPageActionListener != null){
+                if (mOnLoginPageActionListener != null) {
                     //拿到手机号码
                     String phoneNum = inputPhoneNum.getText().toString().trim();
                     mOnLoginPageActionListener.onGetVerifyCodeClick(phoneNum);
+                    beginDownTimer();
                 }
             }
         });
@@ -166,10 +194,24 @@ public class LoginPageView extends FrameLayout {
                 updateAllBtnState();
             }
         });
+        protocolText.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnLoginPageActionListener != null) {
+                    //拿到手机号码
+                    mOnLoginPageActionListener.onOpenProtocolClick();
+                }
+            }
+        });
         loginBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (mOnLoginPageActionListener != null) {
+                    //拿到手机号码
+                    String phoneNum = inputPhoneNum.getText().toString().trim();
+                    String verifyCode = inputVerifyCode.getText().toString().trim();
+                    mOnLoginPageActionListener.onConfirmClick(verifyCode,phoneNum);
+                }
             }
         });
     }
@@ -183,22 +225,23 @@ public class LoginPageView extends FrameLayout {
         checkBoxProtocol = this.findViewById(R.id.check_protocol);
         protocolText = this.findViewById(R.id.check_protocol_text);
         inputPhoneNum = this.findViewById(R.id.input_phone_num);
+        inputPhoneNum.requestFocus();
         inputVerifyCode = this.findViewById(R.id.input_verify_code);
-        inputVerifyCode.setMaxHeight(mVerifyCodeLength);
+        //设置 EditView 最大长度
         inputVerifyCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(mVerifyCodeLength)});
         getVerifyCode = this.findViewById(R.id.get_verify_code);
         loginBtn = this.findViewById(R.id.login_btn);
         loginKeyboard = this.findViewById(R.id.login_key_board);
         disableCopyAndPaste(inputPhoneNum);
         disableCopyAndPaste(inputVerifyCode);
-
+        updateAllBtnState();
     }
 
     private void initAttrs(@NonNull Context context, @Nullable AttributeSet attrs) {
         TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.LoginPageView);
         mColor = attributes.getColor(R.styleable.LoginPageView_mainColor, -1);
-        mVerifyCodeLength = attributes.getInt(R.styleable.LoginPageView_verifyCodeLength, 4);
-        mProtocolUrl = attributes.getString(R.styleable.LoginPageView_protocolUrl);
+        mVerifyCodeLength = attributes.getInt(R.styleable.LoginPageView_verifyCodeLength, SIZE_VERIFY_CODE_DEFAULT);
+        currentDownTimer = attributes.getInt(R.styleable.LoginPageView_countDownDuration,DEFAULT_MILLIS_IN_FUTURE);
         attributes.recycle();
     }
 
@@ -210,8 +253,27 @@ public class LoginPageView extends FrameLayout {
         this.mColor = mColor;
     }
 
+    public long getTotalDuration() {
+        return totalDuration;
+    }
+
+    public void setTotalDuration(long totalDuration) {
+        this.totalDuration = totalDuration;
+        this.currentDownTimer = totalDuration;
+    }
+
+    public long getDTime() {
+        return dTime;
+    }
+
+    public void setDTime(long dTime) {
+        this.dTime = dTime;
+    }
+
     private void updateAllBtnState() {
-        getVerifyCode.setEnabled(isPhoneNumOk);
+        if (!isCountDowmTimer) {
+            getVerifyCode.setEnabled(isPhoneNumOk);
+        }
         loginBtn.setEnabled(isPhoneNumOk && isVerifyCodeOk && isProtocolOk);
     }
 
@@ -236,14 +298,8 @@ public class LoginPageView extends FrameLayout {
 
     public void setVerifyCodeLength(int mVerifyCodeLength) {
         this.mVerifyCodeLength = mVerifyCodeLength;
-    }
-
-    public String getProtocolUrl() {
-        return mProtocolUrl;
-    }
-
-    public void setProtocolUrl(String mProtocolUrl) {
-        this.mProtocolUrl = mProtocolUrl;
+        //设置 EditView 最大长度
+        inputVerifyCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(mVerifyCodeLength)});
     }
 
     public void setOnLoginPageActionListener(OnLoginPageActionListener listener) {
