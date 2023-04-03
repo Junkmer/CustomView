@@ -3,6 +3,9 @@ package com.junker.custom.view;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
+
+import com.junker.custom.view.customview.loginpage.LoginPageView;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -16,20 +19,24 @@ public class LoginActivity extends AppCompatActivity {
         initView();
     }
 
-    private void initView(){
-//        LoginKeyboard keyboard = findViewById(R.id.login_key_board);
-//        keyboard.setOnKeyPressListener(new LoginKeyboard.OnKeyPressListener() {
-//            @Override
-//            public void onNumberPress(int number) {
-//                Log.e(TAG,"number is = > "+number);
-//            }
-//
-//            @Override
-//            public void onBackPress() {
-//                Log.e(TAG,"back...");
-//            }
-//        });
+    private void initView() {
+        LoginPageView pageView = findViewById(R.id.login_page_view);
+        pageView.setOnLoginPageActionListener(new LoginPageView.OnLoginPageActionListener() {
+            @Override
+            public void onGetVerifyCodeClick(String phoneNum) {
+                Log.e(TAG, "phoneNum = > " + phoneNum);
+            }
 
+            @Override
+            public void onOpenProtocolClick() {
+                Log.e(TAG, "onOpenProtocolClick");
+            }
+
+            @Override
+            public void onConfirmClick(String verifyCode, String phoneNum) {
+                Log.e(TAG, "verifyCode = >"+verifyCode+"|phoneNum = > " + phoneNum);
+            }
+        });
 
     }
 }

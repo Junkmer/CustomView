@@ -12,6 +12,6 @@
     <declare-styleable name="LoginPageView">
         <attr name="mainColor" format="color" />
         <attr name="verifyCodeLength" format="integer" />
-        <attr name="protocolUrl" format="string" />
+        <attr name="countDownDuration" format="integer" />
     </declare-styleable>
 </resources>
