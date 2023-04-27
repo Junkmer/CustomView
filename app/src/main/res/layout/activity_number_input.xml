@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".customview.loginpage.LoginActivity">
+    android:background="@color/teal_700"
+    tools:context=".customview.numberinput.NumberInputActivity">
 
-    <com.junker.custom.view.customview.loginpage.LoginPageView
-        android:id="@+id/login_page_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <com.junker.custom.view.customview.numberinput.InputNumberView
+        android:id="@+id/input_number_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         junker:layout_constraintBottom_toBottomOf="parent"
         junker:layout_constraintEnd_toEndOf="parent"
         junker:layout_constraintStart_toStartOf="parent"

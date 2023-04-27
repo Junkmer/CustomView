@@ -13,9 +13,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.自定义View"
         tools:targetApi="31">
-
         <activity
-            android:name=".LoginActivity"
+            android:name=".customview.numberinput.NumberInputActivity"
+            android:exported="false" />
+        <activity
+            android:name=".customview.rebound.ReboundActivity"
+            android:exported="false" />
+        <activity
+            android:name=".customview.loginpage.LoginActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

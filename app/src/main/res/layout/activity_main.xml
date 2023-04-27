@@ -7,24 +7,9 @@
     android:background="#889fdf"
     tools:context=".MainActivity">
 
-    <com.junker.custom.view.customview.numberinput.InputNumberView
-        android:id="@+id/input_number_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        junker:layout_constraintBottom_toBottomOf="parent"
-        junker:layout_constraintEnd_toEndOf="parent"
-        junker:layout_constraintStart_toStartOf="parent"
-        junker:layout_constraintTop_toTopOf="parent" />
-
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        junker:layout_constraintBottom_toBottomOf="parent"
-        android:onClick="loginBtn"
-        junker:layout_constraintEnd_toEndOf="parent"
-        junker:layout_constraintStart_toStartOf="parent"
-        android:text="登录"/>
-
+    <ListView
+        android:id="@+id/main_listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

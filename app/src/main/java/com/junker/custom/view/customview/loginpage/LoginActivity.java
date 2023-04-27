@@ -1,11 +1,11 @@
-package com.junker.custom.view;
+package com.junker.custom.view.customview.loginpage;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
 
-import com.junker.custom.view.customview.loginpage.LoginPageView;
+import com.junker.custom.view.R;
 
 public class LoginActivity extends AppCompatActivity {
 
