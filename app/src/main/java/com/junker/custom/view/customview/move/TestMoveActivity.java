@@ -21,12 +21,9 @@ public class TestMoveActivity extends AppCompatActivity implements View.OnClickL
     private TestMoveView moveViewBtn;
     private TextView moveStyleText;
 
-    private TestButton mButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_test_move);
 
 //        initTestVew();
         initMoveView();
@@ -53,13 +50,50 @@ public class TestMoveActivity extends AppCompatActivity implements View.OnClickL
         scrollBtn.setOnClickListener(this);
         marginBtn.setOnClickListener(this);
         animationBtn.setOnClickListener(this);
-        moveViewBtn.setOnClickListener(this);
+
+        moveViewBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(TestMoveActivity.this, "click move view btn", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "setOnClickListener, onClick...");
+            }
+        });
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public void onClick(View v) {
+        TextView textView = (TextView) v;
+        moveStyleText.setText("当前选择的滑动方式："+textView.getText());
+        switch (v.getId()) {
+            case R.id.layout_btn:
+                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_LAYOUT);
+                break;
+            case R.id.translation_btn:
+                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_TRANSLATION);
+                break;
+            case R.id.offset_btn:
+                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_OFFSET);
+                break;
+            case R.id.scrollBy_btn:
+                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_SCROLL_BY);
+                break;
+            case R.id.scroll_btn:
+                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_SCROLL);
+                break;
+            case R.id.margin_btn:
+                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_MARGIN);
+                break;
+            case R.id.animation_btn:
+                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_ANIMATION);
+                break;
+        }
     }
 
     private void initTestVew() {
         setContentView(R.layout.test_layout);
 
-        mButton = (TestButton) findViewById(R.id.id_btn);
+        TestButton mButton = (TestButton) findViewById(R.id.id_btn);
 //        mButton.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
 //            public boolean onTouch(View v, MotionEvent event) {
@@ -103,37 +137,4 @@ public class TestMoveActivity extends AppCompatActivity implements View.OnClickL
 //        });
     }
 
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.move_view_btn){
-            Toast.makeText(TestMoveActivity.this, "clicke move view btn", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        TextView textView = (TextView) v;
-        moveStyleText.setText("当前选择的滑动方式："+textView.getText());
-        switch (v.getId()) {
-            case R.id.layout_btn:
-                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_LAYOUT);
-                break;
-            case R.id.translation_btn:
-                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_TRANSLATION);
-                break;
-            case R.id.offset_btn:
-                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_OFFSET);
-                break;
-            case R.id.scrollBy_btn:
-                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_SCROLL_BY);
-                break;
-            case R.id.scroll_btn:
-                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_SCROLL);
-                break;
-            case R.id.margin_btn:
-                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_MARGIN);
-                break;
-            case R.id.animation_btn:
-                moveViewBtn.setMoveViewStyle(MOVE_VIEW_STYLE_ANIMATION);
-                break;
-        }
-    }
 }

@@ -2,16 +2,14 @@ package com.junker.custom.view.customview.move;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 
 import androidx.appcompat.widget.AppCompatButton;
-
-import com.junker.custom.view.utils.DensityUtil;
 
 public class TestMoveView extends AppCompatButton {
     private static final String TAG = TestMoveView.class.getSimpleName();
@@ -23,6 +21,8 @@ public class TestMoveView extends AppCompatButton {
     public final static int MOVE_VIEW_STYLE_SCROLL = 4;//通过设置 scroll 移动view
     public final static int MOVE_VIEW_STYLE_MARGIN = 5;//通过设置 margin 移动view
     public final static int MOVE_VIEW_STYLE_ANIMATION = 6;//通过设置 animation 移动view
+
+    private final static int TOUCH_INTERVAL_TIME = 300;//单位毫秒
 
     private int layoutX;
     private int layoutY;
@@ -44,13 +44,19 @@ public class TestMoveView extends AppCompatButton {
     private float currentX;
     private float currentY;
 
+    //用于控制设置 onClickListener 时间后，移动view 之后不再触发 点击事件
+    private long mDownTouchTime;
+    private long mUpTouchTime;
+
     /**
+     * 设置移动view方式
      * 0：layout
      * 1：setTranslationX / setTranslationY
-     * 2：scrollBy
-     * 3；setScrollX / setScrollY
-     * 4：offsetTopAndBottom / offsetLeftAndRight
-     * 5：setAnimation
+     * 2：offsetTopAndBottom / offsetLeftAndRight
+     * 3：scrollBy
+     * 4；setScrollX / setScrollY、scrollTo
+     * 5：setMargins
+     * 6：setAnimation
      */
     private int mMoveViewStyle = 0;
 
@@ -69,10 +75,6 @@ public class TestMoveView extends AppCompatButton {
 
     private void initAttr() {
         mMoveViewStyle = MOVE_VIEW_STYLE_LAYOUT;//通过设置 layout 移动view
-    }
-
-    private int px2dip(float pxValue) {
-        return DensityUtil.px2dip(getContext(), pxValue);
     }
 
     /**
@@ -98,34 +100,20 @@ public class TestMoveView extends AppCompatButton {
      */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        int left = px2dip(getLeft());
-        int top = px2dip(getTop());
-        int right = px2dip(getRight());
-        int bottom = px2dip(getBottom());
-        Log.e(TAG, "dispatchTouchEvent \nleft = " + getLeft() + "    top = " + getTop() + "    right = " + getRight() + "    bottom = " + getBottom() + "\n"
-                + "left = " + left + "    top = " + top + "    right = " + right + "    bottom = " + bottom + "\n"
-                + "getX = " + event.getX() + "\n"
-                + "getX = " + px2dip(event.getX()) + "\n"
-                + "getY = " + event.getY() + "\n"
-                + "getY = " + px2dip(event.getY()) + "\n"
-                + "getRawX = " + event.getRawX() + "\n"
-                + "getRawY = " + event.getRawY() + "\n"
-                + "getScrollX = " + getScrollX() + "\n"
-                + "getScrollY = " + getScrollY() + "\n"
-                + "getTranslationX = " + getTranslationX() + "\n"
-                + "getTranslationY = " + getTranslationY() + "\n"
-        );
+        logcat(event);
         dispatchTouchEventT(event);
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 Log.i(TAG, "dispatchTouchEvent, ACTION_DOWN");
                 dispatchTouchEvent2ACTION_DOWN();
-                return true;
+                mDownTouchTime = System.currentTimeMillis();
+                break;
             case MotionEvent.ACTION_MOVE:
                 Log.i(TAG, "dispatchTouchEvent, ACTION_MOVE");
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                mUpTouchTime = System.currentTimeMillis();
                 Log.e(TAG, "dispatchTouchEvent -> MotionEvent.ACTION_CANCEL/MotionEvent.ACTION_UP");
                 break;
         }
@@ -134,6 +122,20 @@ public class TestMoveView extends AppCompatButton {
         return b;
     }
 
+    private void logcat(MotionEvent event){
+        Log.e(TAG, "dispatchTouchEvent \nleft = " + getLeft() + "    top = " + getTop() + "    right = " + getRight() + "    bottom = " + getBottom() + "\n"
+                + "getX = " + event.getX() + "\n"
+                + "getY = " + event.getY() + "\n"
+                + "getRawX = " + event.getRawX() + "\n"
+                + "getRawY = " + event.getRawY() + "\n"
+                + "getScrollX = " + getScrollX() + "\n"
+                + "getScrollY = " + getScrollY() + "\n"
+                + "getTranslationX = " + getTranslationX() + "\n"
+                + "getTranslationY = " + getTranslationY() + "\n"
+        );
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.i(TAG, "触发 onTouchEvent 事件");
@@ -149,6 +151,9 @@ public class TestMoveView extends AppCompatButton {
             case MotionEvent.ACTION_CANCEL:
                 Log.e(TAG, "onTouchEvent, ACTION_MOVE/ACTION_POINTER_UP");
                 onTouchEvent2ACTION_CANCEL();
+                if (mUpTouchTime - mDownTouchTime > TOUCH_INTERVAL_TIME){
+                    return true;
+                }
                 break;
         }
         boolean b = super.onTouchEvent(event);
@@ -215,8 +220,8 @@ public class TestMoveView extends AppCompatButton {
     }
 
     private void onTouchEvent2ACTION_MOVE() {
-        int changeX = 0;
-        int changeY = 0;
+        int changeX;
+        int changeY;
         if (mMoveViewStyle == MOVE_VIEW_STYLE_LAYOUT) {
             // 计算偏移量
             changeX = difX - layoutX;
@@ -250,11 +255,9 @@ public class TestMoveView extends AppCompatButton {
             int offsetX = scrollX - difX + getScrollX();//使用scrollTo设置控件移动，偏移的距离=之前已经偏移的距离+本次手势滑动了多大距离
             int offsetY = scrollY - difY + getScrollY();
             Log.e(TAG, "onTouchEvent, ACTION_MOVE - SCROLL -> offsetX=" + offsetX + "|offsetY=" + offsetY);
-            //设置方式一
+            //设置方式一、设置方式二：scrollTo(offsetX, offsetY);
             setScrollX(offsetX);
             setScrollY(offsetY);
-//            //设置方式二
-//            scrollTo(offsetX, offsetY);
             scrollX = difX;
             scrollY = difY;
         } else if (mMoveViewStyle == MOVE_VIEW_STYLE_MARGIN) {
@@ -282,21 +285,19 @@ public class TestMoveView extends AppCompatButton {
     }
 
     private void onTouchEvent2ACTION_CANCEL() {
-        if (mMoveViewStyle == MOVE_VIEW_STYLE_LAYOUT) {
-            //TODO:不做处理
-        } else if (mMoveViewStyle == MOVE_VIEW_STYLE_TRANSLATION) {
-            currentX = getTranslationX();
-            currentY = getTranslationY();
-        } else if (mMoveViewStyle == MOVE_VIEW_STYLE_OFFSET) {
-            //TODO:不做处理
-        } else if (mMoveViewStyle == MOVE_VIEW_STYLE_SCROLL_BY) {
-            //TODO:不做处理
-        } else if (mMoveViewStyle == MOVE_VIEW_STYLE_SCROLL) {
-            //TODO:不做处理
-        } else if (mMoveViewStyle == MOVE_VIEW_STYLE_MARGIN) {
-            //TODO:不做处理
-        } else if (mMoveViewStyle == MOVE_VIEW_STYLE_ANIMATION) {
-            //TODO:不做处理
+        switch (mMoveViewStyle) {
+            case MOVE_VIEW_STYLE_TRANSLATION:
+                currentX = getTranslationX();
+                currentY = getTranslationY();
+                break;
+            case MOVE_VIEW_STYLE_LAYOUT:
+            case MOVE_VIEW_STYLE_OFFSET:
+            case MOVE_VIEW_STYLE_SCROLL_BY:
+            case MOVE_VIEW_STYLE_SCROLL:
+            case MOVE_VIEW_STYLE_MARGIN:
+            case MOVE_VIEW_STYLE_ANIMATION:
+                //TODO:不做处理
+                break;
         }
     }
 }
