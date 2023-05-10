@@ -14,4 +14,13 @@
         <attr name="verifyCodeLength" format="integer" />
         <attr name="countDownDuration" format="integer" />
     </declare-styleable>
+
+    <declare-styleable name="ReboundLayout">
+        <attr name="reBoundOrientation" format="enum">
+            <enum name="horizontal" value="0"/>
+            <enum name="vertical" value="1" />
+        </attr>
+        <attr name="resistance" format="float" />
+        <attr name="reBoundDuration" format="integer" />
+    </declare-styleable>
 </resources>

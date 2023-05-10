@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.junker.custom.view.customview.loginpage.LoginActivity;
+import com.junker.custom.view.customview.move.TestMoveActivity;
 import com.junker.custom.view.customview.numberinput.NumberInputActivity;
 import com.junker.custom.view.customview.rebound.ReboundActivity;
 
@@ -52,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
                     case "回弹布局":
                         intent = new Intent(MainActivity.this, ReboundActivity.class);
                         break;
+                    case "测试多种方式View移动":
+                        intent = new Intent(MainActivity.this, TestMoveActivity.class);
+                        break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + titles.get(position));
                 }
@@ -65,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         titles.add("计数器布局");
         titles.add("登录布局");
         titles.add("回弹布局");
+        titles.add("测试多种方式View移动");
     }
 
     private void initAdapter() {
@@ -88,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
             public View getView(int position, View convertView, ViewGroup parent) {
                 @SuppressLint("ViewHolder") View view = getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
                 TextView textView = view.findViewById(android.R.id.text1);
-//                textView.setText(String.format("第（%s）数据",(position + 1)));
                 textView.setText(getItem(position));
                 return view;
             }

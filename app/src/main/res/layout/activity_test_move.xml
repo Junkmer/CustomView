@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".customview.move.TestMoveActivity">
+
+    <TextView
+        android:id="@+id/select_move_type_tip"
+        style="@style/MoveButton"
+        android:text="当前选择的滑动方式："
+        android:textColor="@android:color/holo_red_dark"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/layout_btn"
+        style="@style/MoveButton"
+        android:text="Layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/select_move_type_tip" />
+
+    <Button
+        android:id="@+id/translation_btn"
+        style="@style/MoveButton"
+        android:text="Translation"
+        app:layout_constraintStart_toEndOf="@id/layout_btn"
+        app:layout_constraintTop_toBottomOf="@+id/select_move_type_tip" />
+
+    <Button
+        android:id="@+id/offset_btn"
+        style="@style/MoveButton"
+        android:text="Offset"
+        app:layout_constraintStart_toEndOf="@id/translation_btn"
+        app:layout_constraintTop_toBottomOf="@+id/select_move_type_tip" />
+
+    <Button
+        android:id="@+id/scrollBy_btn"
+        style="@style/MoveButton"
+        android:text="ScrollBy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_btn" />
+
+    <Button
+        android:id="@+id/scroll_btn"
+        style="@style/MoveButton"
+        android:text="Scroll"
+        app:layout_constraintStart_toEndOf="@id/scrollBy_btn"
+        app:layout_constraintTop_toBottomOf="@+id/layout_btn" />
+
+    <Button
+        android:id="@+id/margin_btn"
+        style="@style/MoveButton"
+        android:text="Margin"
+        app:layout_constraintStart_toEndOf="@id/scroll_btn"
+        app:layout_constraintTop_toBottomOf="@id/translation_btn" />
+
+    <Button
+        android:id="@+id/animation_btn"
+        style="@style/MoveButton"
+        android:text="Animation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollBy_btn" />
+
+    <com.junker.custom.view.customview.move.TestMoveView
+        android:id="@+id/move_view_btn"
+        style="@style/MoveButton"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@color/purple_700"
+        android:gravity="center"
+        android:text="可移动的View"
+        android:textColor="@color/white"
+        android:layout_marginTop="237dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
