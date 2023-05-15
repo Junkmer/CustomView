@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".customview.rebound.ScrollReboundActivity">
+
+    <com.junker.custom.view.customview.rebound.ScrollReboundLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 1" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 2" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 3" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 4" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 5" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 6" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 7" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 8" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 9" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 10" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 11" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 12" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 13" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 14" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 15" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 16" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 17" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+        </LinearLayout>
+
+    </com.junker.custom.view.customview.rebound.ScrollReboundLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

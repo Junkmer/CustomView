@@ -41,4 +41,13 @@
         <item name="android:layout_marginTop">15dp</item>
         <item name="textAllCaps">false</item>
     </style>
+
+    <style name="ScrollText">
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginTop">1dp</item>
+        <item name="android:background">@color/grey_8d</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:gravity">center</item>
+    </style>
 </resources>

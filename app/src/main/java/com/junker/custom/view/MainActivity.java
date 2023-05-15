@@ -16,7 +16,9 @@ import android.widget.TextView;
 import com.junker.custom.view.customview.loginpage.LoginActivity;
 import com.junker.custom.view.customview.move.TestMoveActivity;
 import com.junker.custom.view.customview.numberinput.NumberInputActivity;
+import com.junker.custom.view.customview.rebound.JunkerReboundActivity;
 import com.junker.custom.view.customview.rebound.ReboundActivity;
+import com.junker.custom.view.customview.rebound.ScrollReboundActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
     private ListView listView;
-    private List<String> titles;
+    private List<ActivityBean> titles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,18 +45,24 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.e(TAG, "click item position = " + position);
                 Intent intent;
-                switch (titles.get(position)) {
-                    case "计数器布局":
+                switch (titles.get(position).getPosition()) {
+                    case 1:
                         intent = new Intent(MainActivity.this, NumberInputActivity.class);
                         break;
-                    case "登录布局":
+                    case 2:
                         intent = new Intent(MainActivity.this, LoginActivity.class);
                         break;
-                    case "回弹布局":
+                    case 3:
                         intent = new Intent(MainActivity.this, ReboundActivity.class);
                         break;
-                    case "测试多种方式View移动":
+                    case 4:
                         intent = new Intent(MainActivity.this, TestMoveActivity.class);
+                        break;
+                    case 5:
+                        intent = new Intent(MainActivity.this, JunkerReboundActivity.class);
+                        break;
+                    case 6:
+                        intent = new Intent(MainActivity.this, ScrollReboundActivity.class);
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + titles.get(position));
@@ -66,10 +74,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         titles = new ArrayList<>();
-        titles.add("计数器布局");
-        titles.add("登录布局");
-        titles.add("回弹布局");
-        titles.add("测试多种方式View移动");
+        titles.add(new ActivityBean(1, "计数器布局", NumberInputActivity.class));
+        titles.add(new ActivityBean(2, "登录布局", LoginActivity.class));
+        titles.add(new ActivityBean(3, "回弹布局", ReboundActivity.class));
+        titles.add(new ActivityBean(4, "测试多种方式View移动", TestMoveActivity.class));
+        titles.add(new ActivityBean(5, "实现类似QQ微信阻尼回调效果", JunkerReboundActivity.class));
+        titles.add(new ActivityBean(6, "ScrollView+阻尼回调效果", ScrollReboundActivity.class));
     }
 
     private void initAdapter() {
@@ -80,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public String getItem(int position) {
+            public ActivityBean getItem(int position) {
                 return titles.get(position);
             }
 
@@ -93,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             public View getView(int position, View convertView, ViewGroup parent) {
                 @SuppressLint("ViewHolder") View view = getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
                 TextView textView = view.findViewById(android.R.id.text1);
-                textView.setText(getItem(position));
+                textView.setText(getItem(position).getTitle());
                 return view;
             }
         };
