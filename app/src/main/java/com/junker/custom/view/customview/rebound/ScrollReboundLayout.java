@@ -22,20 +22,33 @@ public class ScrollReboundLayout extends ScrollView {
     private static final String TAG = ScrollReboundLayout.class.getSimpleName();
     private final static String TYPE_ANIMATION_TRANSLATION_Y = "translationY";
 
-    private boolean isScrolledToTop = false; //判断ScrollView是否滑动到顶部
-    private boolean isScrolledToBottom = false; //判断ScrollView是否滑动到顶部
+    private boolean isScrolledToTop = false;    //判断ScrollView是否滑动到顶部
+    private boolean isScrolledToBottom = false; //判断ScrollView是否滑动到底部
 
-    private float downX;                  //首次触摸屏幕时的X坐标
-    private float downY;                  //首次触摸屏幕时的Y坐标
+    private boolean isCurrentTouchToTop = false;      //当前手指按下屏幕是否处于顶部
+    private boolean isCurrentTouchToBottom = false;   //当前手指按下屏幕是否处于底部
 
-    private float difX;                   //停止滑动触摸屏幕前，最新一次的X坐标
-    private float difY;                   //停止滑动触摸屏幕前，最新一次的X坐标
+    private float downX;                        //首次触摸屏幕时的X坐标
+    private float downY;                        //首次触摸屏幕时的Y坐标
 
-    private float offsetX;                //手指按下屏幕滑动View的X坐标偏移量：offsetX = difX - downX;
-    private float offsetY;                //手指按下屏幕滑动View的Y坐标偏移量：offsetY = difY - downY;
+    private float difX;                         //停止滑动触摸屏幕前，最新一次的X坐标
+    private float difY;                         //停止滑动触摸屏幕前，最新一次的X坐标
 
-    private float beforeOffsetX;          //下一次触摸屏幕前的剩余X坐标偏移量
-    private float beforeOffsetY;          //下一次触摸屏幕前的剩余Y坐标偏移量
+//    private float moveX;                        //手指在屏幕上按下移动的 X坐标位移
+//    private float moveY;                        //手指在屏幕上按下移动的 Y坐标位移
+
+    private float scrollX;                      //触摸屏幕滑动时 scrollView 滑动的 X坐标位移
+    private float scrollY;                      //触摸屏幕滑动时 scrollView 滑动的 Y坐标位移
+
+    private float offsetX;                      //手指按下屏幕滑动View的X坐标偏移量
+    private float offsetY;                      //手指按下屏幕滑动View的Y坐标偏移量
+
+    private float beforeOffsetX;                //下一次触摸屏幕前的剩余X坐标偏移量
+    private float beforeOffsetY;                //下一次触摸屏幕前的剩余Y坐标偏移量
+
+    private boolean isOffset;                   //是否发生了偏移
+
+    private boolean isCanScroll;                //是否可以滚动
 
     private ObjectAnimator animator;
     private int mDuration = 200;
@@ -55,38 +68,56 @@ public class ScrollReboundLayout extends ScrollView {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        Log.e(TAG, "dispatchTouchEvent...");
         difY = ev.getRawY();
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 downY = difY;
-                if (animator != null && animator.isRunning()) {
-                    animator.pause();
-                    float animatedFraction = animator.getAnimatedFraction();//获取上一次动画已经播放的百分比
-                    beforeOffsetY = offsetY - offsetY * animatedFraction;//获取动画还未执行完时，又再次触摸屏幕时的剩余偏移量，便于再次基于当前位置继续滑动
-                    animator.cancel();
-                } else {
-                    beforeOffsetY = 0;
-                }
+                isCurrentTouchToTop = getScrollY() == 0;
+                isCurrentTouchToBottom = getChildAt(0) == null || getChildAt(0).getMeasuredHeight() == (getScrollY() + getHeight());
+//                if (animator != null && animator.isRunning()) {
+//                    animator.pause();
+//                    float animatedFraction = animator.getAnimatedFraction();//获取上一次动画已经播放的百分比
+//                    beforeOffsetY = offsetY - offsetY * animatedFraction;//获取动画还未执行完时，又再次触摸屏幕时的剩余偏移量，便于再次基于当前位置继续滑动
+//                    animator.cancel();
+//                } else {
+//                    beforeOffsetY = 0;
+//                }
                 break;
             case MotionEvent.ACTION_MOVE:
-                offsetY = (difY - downY) / 2 + beforeOffsetY;
                 isScrolledToTop = getScrollY() == 0;
-                View contentView = getChildAt(0);
-                if (contentView == null || contentView.getMeasuredHeight() == (getScrollY() + getHeight())) {
-                    isScrolledToBottom = true;
+                isScrolledToBottom = getChildAt(0) == null || getChildAt(0).getMeasuredHeight() == (getScrollY() + getHeight());
+
+                if (isCurrentTouchToTop || isCurrentTouchToBottom) {
+                    scrollY = 0;
+                    isCurrentTouchToTop = false;
+                    isCurrentTouchToBottom = false;
+                    Log.e(TAG, "0000000000000000000000000000000000000");
                 } else {
-                    isScrolledToBottom = false;
+                    if (!isScrolledToBottom && offsetY < 0) {
+                        scrollY = difY - downY;
+                        Log.e(TAG, "1111111111111111111111111111111111");
+                        isCanScroll = true;
+                    } else if (!isScrolledToTop && offsetY > 0) {
+                        isCanScroll = true;
+                        scrollY = difY - downY;
+                        Log.e(TAG, "2222222222222222222222222222222222");
+                    }else {
+                        isCanScroll = false;
+                        Log.e(TAG, "3333333333333333333333333333333333");
+                    }
                 }
 
-                Log.e(TAG, "offsetY = " + offsetY
-                        + " <:> " + "translation-Y = " + getTranslationY()
-                        + " <:> " + "isScrolledToTop = " + isScrolledToTop
-                        + " <:> " + "isScrolledToBottom = " + isScrolledToBottom);
+                offsetY = (difY - downY - scrollY) / 2 + beforeOffsetY;
+
+//                Log.e(TAG, "offsetY = " + offsetY
+//                        + " <:> " + "translation-Y = " + getTranslationY()
+//                        + " <:> " + "isScrolledToTop = " + isScrolledToTop
+//                        + " <:> " + "isScrolledToBottom = " + isScrolledToBottom
+//                        + " <:> " + "scrollY = " + scrollY
+//                        + " <:> " + "isCanScroll = " + isCanScroll);
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-
                 break;
         }
         return super.dispatchTouchEvent(ev);
@@ -95,18 +126,18 @@ public class ScrollReboundLayout extends ScrollView {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        Log.e(TAG, "onTouchEvent...");
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (isScrolledToTop || isScrolledToBottom) {
+                if (isScrolledToTop || isScrolledToBottom || Math.abs(offsetY) > 0) {
                     setTranslationY(offsetY);
                 }
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                if ((isScrolledToTop || isScrolledToBottom) && Math.abs(offsetY) > 0) {
+                if ((isScrolledToTop || isScrolledToBottom) || Math.abs(offsetY) > 0) {
+
                     if (animator != null && animator.isRunning()) {
                         animator.cancel();
                     }
@@ -116,18 +147,44 @@ public class ScrollReboundLayout extends ScrollView {
                 }
                 break;
         }
-        return super.onTouchEvent(ev);
+        if (isCanScroll) { //自身消费，阻止向下传递，实现ScrollView不滚动。
+            return super.onTouchEvent(ev);
+        } else {
+            return true;
+        }
     }
 
     @Override
     protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
-        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
-//        Log.e(TAG, "onOverScrolled...");
-        if (scrollY == 0) {
-//            Log.e(TAG, "onOverScrolled isScrolledToTop:" + clampedY);
+        if (isCanScroll) {
+            super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+            Log.e(TAG, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         } else {
-//            Log.e(TAG, "onOverScrolled isScrolledToBottom:" + clampedY);
+            Log.e(TAG, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
         }
+//        Log.e(TAG, "onOverScrolled..."
+//                + " scrollX = " + scrollX
+//                + " <:> " + "scrollY = " + scrollY
+//                + " <:> " + "clampedX = " + clampedX
+//                + " <:> " + "clampedY = " + clampedY);
+
+    }
+
+    @Override
+    protected void onScrollChanged(int left, int top, int oldLeft, int oldTop) {
+//        if (top != 0 || top != (getMeasuredHeight() - getHeight())){
+//            isCanScroll = true;
+//        }
+    }
+
+    /**
+     * 是否需要Y移动布局
+     */
+    public boolean isNeedTranslate() {
+        int offset = getMeasuredHeight() - getHeight();
+        int scrollY = getScrollY();
+        // 顶部或者底部
+        return scrollY == 0 || scrollY == offset;
     }
 
     public static class DampInterpolator implements Interpolator {
