@@ -95,6 +95,107 @@
             <TextView
                 style="@style/ScrollText"
                 android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 18" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 49" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 55" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 50" />
+
+            <TextView
+                style="@style/ScrollText"
+                android:text="Hello Word 50" />
+
         </LinearLayout>
 
     </com.junker.custom.view.customview.rebound.ScrollReboundLayout>

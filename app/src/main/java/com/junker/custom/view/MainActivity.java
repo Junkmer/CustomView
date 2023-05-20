@@ -1,17 +1,26 @@
 package com.junker.custom.view;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.PermissionRequest;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.junker.custom.view.customview.loginpage.LoginActivity;
 import com.junker.custom.view.customview.move.TestMoveActivity;
@@ -20,6 +29,7 @@ import com.junker.custom.view.customview.rebound.JunkerReboundActivity;
 import com.junker.custom.view.customview.rebound.ReboundActivity;
 import com.junker.custom.view.customview.rebound.ScrollReboundActivity;
 
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +73,13 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 6:
                         intent = new Intent(MainActivity.this, ScrollReboundActivity.class);
+//                        int selfPermission = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA);
+//                        if (selfPermission != PackageManager.PERMISSION_GRANTED) {
+//                            test();
+//                        } else {
+//                            Toast.makeText(MainActivity.this, "已申请该权限", Toast.LENGTH_SHORT).show();
+//                        }
+
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + titles.get(position));
@@ -110,4 +127,32 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
+    private void test() {
+        ActivityCompat.requestPermissions(MainActivity.this, GROUP_STORAGE, 123);
+//        requestPermissions(GROUP_STORAGE,123);
+    }
+
+    private static final String[] GROUP_STORAGE = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    };
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 123) {
+            int position = 0;
+            for (String item : permissions) {
+                Log.e(TAG,"permissions -> "+item);
+            }
+
+            for (int item : grantResults) {
+                Log.e(TAG,"grantResults -> "+item);
+            }
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) { //同意权限申请
+                Toast.makeText(this, "已同意该权限", Toast.LENGTH_SHORT).show();
+            } else { //拒绝权限申请
+                Toast.makeText(this, "权限被拒绝了", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
