@@ -27,7 +27,9 @@ import androidx.core.widget.NestedScrollView;
  */
 public class ScrollReboundLayout extends ScrollView {
     private static final String TAG = ScrollReboundLayout.class.getSimpleName();
+
     private final static String TYPE_ANIMATION_TRANSLATION_Y = "translationY";
+    private final static double DEFAULT_DAMPED_REBOUND_VALUE = 7.5;
 
     private boolean isCurrentTouchToTop = false;        //当前手指按下屏幕是否处于顶部
     private boolean isCurrentTouchToBottom = false;     //当前手指按下屏幕是否处于底部
@@ -60,6 +62,9 @@ public class ScrollReboundLayout extends ScrollView {
 
     private ObjectAnimator animator;
     private int mDuration = 200;
+
+    private int lastTouchScrollY;
+    private long lastTouchTime;
 
     public ScrollReboundLayout(Context context) {
         this(context, null);
@@ -213,10 +218,6 @@ public class ScrollReboundLayout extends ScrollView {
         }
     }
 
-    private int lastTouchScrollY;
-    private long lastTouchTime;
-    private final static double DEFAULT_DAMPED_REBOUND_VALUE = 7.5;
-
     @Override
     protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
         if (isCanScroll) {
@@ -249,5 +250,14 @@ public class ScrollReboundLayout extends ScrollView {
 
     public boolean isScrolledToBottom() {
         return getChildAt(0) == null || getChildAt(0).getMeasuredHeight() == (getScrollY() + getHeight());
+    }
+
+
+    public int getmDuration() {
+        return mDuration;
+    }
+
+    public void setmDuration(int mDuration) {
+        this.mDuration = mDuration;
     }
 }
