@@ -253,11 +253,11 @@ public class ScrollReboundLayout extends ScrollView {
     }
 
 
-    public int getmDuration() {
+    public int getDuration() {
         return mDuration;
     }
 
-    public void setmDuration(int mDuration) {
+    public void setDuration(int mDuration) {
         this.mDuration = mDuration;
     }
 }

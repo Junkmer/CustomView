@@ -13,4 +13,7 @@
 
     <color name="color_key_pad_normal">#383838</color>
     <color name="color_key_pad_press">#F0F0F0</color>
+    
+    <color name="text_grey">#888585</color>
+    <color name="text_grey_press">#99888585</color>
 </resources>
