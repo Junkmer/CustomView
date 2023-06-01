@@ -21,7 +21,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.自定义View">
-
+        <activity
+            android:name=".customview.keypad.KeypadActivity"
+            android:exported="false" />
         <activity
             android:name=".customview.flow.FlowActivity"
             android:exported="false" />

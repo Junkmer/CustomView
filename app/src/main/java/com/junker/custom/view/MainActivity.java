@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.junker.custom.view.customview.flow.FlowActivity;
+import com.junker.custom.view.customview.keypad.KeypadActivity;
 import com.junker.custom.view.customview.loginpage.LoginActivity;
 import com.junker.custom.view.customview.move.TestMoveActivity;
 import com.junker.custom.view.customview.numberinput.NumberInputActivity;
@@ -78,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
                     case 7:
                         intent = new Intent(MainActivity.this, FlowActivity.class);
                         break;
+                    case 8:
+                        intent = new Intent(MainActivity.this, KeypadActivity.class);
+                        break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + titles.get(position));
                 }
@@ -95,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         titles.add(new ActivityBean(5, "实现类似QQ微信阻尼回调效果", JunkerReboundActivity.class));
         titles.add(new ActivityBean(6, "ScrollView+阻尼回调效果", ScrollReboundActivity.class));
         titles.add(new ActivityBean(7, "流式动态布局", FlowActivity.class));
+        titles.add(new ActivityBean(8, "ViewGroup实现的Keypad", KeypadActivity.class));
     }
 
     private void initAdapter() {
