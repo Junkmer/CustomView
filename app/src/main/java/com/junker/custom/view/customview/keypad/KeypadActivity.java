@@ -16,21 +16,5 @@ public class KeypadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_keypad);
-
-        TextView textView = findViewById(R.id.textView);
-
-        StateListDrawable listDrawable = new StateListDrawable();
-        //按下bg
-        GradientDrawable pressDrawable = new GradientDrawable();
-        pressDrawable.setColor(getResources().getColor(R.color.key_item_press_color));
-        pressDrawable.setCornerRadius(DensityUtil.dip2px(5));
-        listDrawable.addState(new int[]{android.R.attr.state_pressed}, pressDrawable);
-        //普通状态bg
-        GradientDrawable normalDrawable = new GradientDrawable();
-        normalDrawable.setColor(getResources().getColor(R.color.key_item_color));
-        normalDrawable.setCornerRadius(DensityUtil.dip2px(5));
-        listDrawable.addState(new int[]{},normalDrawable);
-        //设置背景
-        textView.setBackground(listDrawable);
     }
 }

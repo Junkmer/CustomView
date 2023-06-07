@@ -35,7 +35,8 @@
     </declare-styleable>
 
     <declare-styleable name="KeypadView">
-        <attr name="textColor" format="color"/>
+        <attr name="itemMargin" format="dimension" />
+        <attr name="keyTextColor" format="color"/>
         <attr name="textSize" format="dimension"/>
         <attr name="itemPressBg" format="color"/>
         <attr name="itemNormalBg" format="color"/>
