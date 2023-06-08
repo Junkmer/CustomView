@@ -23,7 +23,7 @@ public class KeypadView extends ViewGroup {
 
     public static final int DEFAULT_ROW = 4;
     public static final int DEFAULT_COLUMN = 3;
-    public static final int DEFAULT_TEXTVIEW_SIZE = DensityUtil.dip2px(16);
+    public static final int DEFAULT_TEXTVIEW_SIZE = -1;
     public static final int DEFAULT_MARGIN = DensityUtil.dip2px(6);
 
     private static final String TAG = KeypadView.class.getSimpleName();
@@ -34,6 +34,7 @@ public class KeypadView extends ViewGroup {
     private int row = DEFAULT_ROW;
     private int column = DEFAULT_COLUMN;
     private int mItemMargin;
+    private OnNumberClickListener mOnNumberClickListener;
 
     public KeypadView(Context context) {
         this(context, null);
@@ -66,7 +67,9 @@ public class KeypadView extends ViewGroup {
                 item.setText(String.valueOf(i));
             }
             //大小
-            item.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+            if (mTextSize != -1) {
+                item.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+            }
             //居中
             item.setGravity(Gravity.CENTER);
             //字体颜色
@@ -76,7 +79,16 @@ public class KeypadView extends ViewGroup {
             item.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //todo:
+                    if (mOnNumberClickListener != null) {
+                        if (!(boolean) v.getTag()) {
+                            if (v instanceof TextView) {
+                                String valueText = ((TextView) v).getText().toString();
+                                mOnNumberClickListener.onNumberClick(Integer.parseInt(valueText));
+                            }
+                        } else {
+                            mOnNumberClickListener.onDeleteClick();
+                        }
+                    }
                 }
             });
 
@@ -89,12 +101,12 @@ public class KeypadView extends ViewGroup {
         StateListDrawable listDrawable = new StateListDrawable();
         //按下bg
         GradientDrawable pressDrawable = new GradientDrawable();
-        pressDrawable.setColor(getResources().getColor(R.color.key_item_press_color));
+        pressDrawable.setColor(mItemPressBg);
         pressDrawable.setCornerRadius(DensityUtil.dip2px(5));
         listDrawable.addState(new int[]{android.R.attr.state_pressed}, pressDrawable);
         //普通状态bg
         GradientDrawable normalDrawable = new GradientDrawable();
-        normalDrawable.setColor(getResources().getColor(R.color.key_item_color));
+        normalDrawable.setColor(mItemNormalBg);
         normalDrawable.setCornerRadius(DensityUtil.dip2px(5));
         listDrawable.addState(new int[]{}, normalDrawable);
 
@@ -106,7 +118,7 @@ public class KeypadView extends ViewGroup {
         mTextColor = a.getColor(R.styleable.KeypadView_keyTextColor, context.getResources().getColor(R.color.white));
         mTextSize = a.getDimensionPixelSize(R.styleable.KeypadView_textSize, DEFAULT_TEXTVIEW_SIZE);
         mItemMargin = a.getDimensionPixelSize(R.styleable.KeypadView_itemMargin, DEFAULT_MARGIN);
-        mItemPressBg = a.getColor(R.styleable.KeypadView_itemPressBg, context.getResources().getColor(R.color.key_item_color));
+        mItemPressBg = a.getColor(R.styleable.KeypadView_itemPressBg, context.getResources().getColor(R.color.key_item_press_color));
         mItemNormalBg = a.getColor(R.styleable.KeypadView_itemNormalBg, context.getResources().getColor(R.color.key_item_color));
         //回收资源
         a.recycle();
@@ -115,7 +127,7 @@ public class KeypadView extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int verticalPadding = getPaddingTop() + getPaddingBottom();
-        int horizontalPadding = getPaddingLeft()+getPaddingRight();
+        int horizontalPadding = getPaddingLeft() + getPaddingRight();
 
         //测量孩子
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
@@ -127,11 +139,12 @@ public class KeypadView extends ViewGroup {
 //        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
 //        Log.e(TAG, "heightSize = " + heightSize);
 //        Log.e(TAG, "heightModeType = " + getModeType(heightMode));
+
         int perItemWidth = (widthSize - (column + 1) * mItemMargin - verticalPadding) / column;
         int perItemHeight = (heightSize - (row + 1) * mItemMargin - horizontalPadding) / row;
 
         int normalWidthSpec = MeasureSpec.makeMeasureSpec(perItemWidth, MeasureSpec.EXACTLY);
-        int deleteWidthSpec = MeasureSpec.makeMeasureSpec(perItemWidth * 2+ mItemMargin, MeasureSpec.EXACTLY);
+        int deleteWidthSpec = MeasureSpec.makeMeasureSpec(perItemWidth * 2 + mItemMargin, MeasureSpec.EXACTLY);
         int heightSpec = MeasureSpec.makeMeasureSpec(perItemHeight, MeasureSpec.EXACTLY);
         for (int i = 0; i < getChildCount(); i++) {
             View item = getChildAt(i);
@@ -165,6 +178,46 @@ public class KeypadView extends ViewGroup {
         }
     }
 
+    public int getTextColor() {
+        return mTextColor;
+    }
+
+    public void setTextColor(int mTextColor) {
+        this.mTextColor = mTextColor;
+    }
+
+    public float getTextSize() {
+        return mTextSize;
+    }
+
+    public void setTextSize(float mTextSize) {
+        this.mTextSize = mTextSize;
+    }
+
+    public int getItemPressBg() {
+        return mItemPressBg;
+    }
+
+    public void setItemPressBg(int mItemPressBg) {
+        this.mItemPressBg = mItemPressBg;
+    }
+
+    public int getItemNormalBg() {
+        return mItemNormalBg;
+    }
+
+    public void setItemNormalBg(int mItemNormalBg) {
+        this.mItemNormalBg = mItemNormalBg;
+    }
+
+    public int getItemMargin() {
+        return mItemMargin;
+    }
+
+    public void setItemMargin(int mItemMargin) {
+        this.mItemMargin = mItemMargin;
+    }
+
     private String getModeType(int mode) {
         String modeType = "";
         if (mode == MeasureSpec.AT_MOST) {
@@ -175,5 +228,15 @@ public class KeypadView extends ViewGroup {
             modeType = "EXACTLY";
         }
         return modeType;
+    }
+
+    public void setOnNumberClickListener(OnNumberClickListener listener) {
+        this.mOnNumberClickListener = listener;
+    }
+
+    public interface OnNumberClickListener {
+        void onNumberClick(int value);
+
+        void onDeleteClick();
     }
 }
