@@ -30,6 +30,7 @@ import com.junker.custom.view.customview.numberinput.NumberInputActivity;
 import com.junker.custom.view.customview.rebound.JunkerReboundActivity;
 import com.junker.custom.view.customview.rebound.ReboundActivity;
 import com.junker.custom.view.customview.rebound.ScrollReboundActivity;
+import com.junker.custom.view.customview.slidemenu.SlideMenuActivity;
 
 import java.security.Permission;
 import java.util.ArrayList;
@@ -82,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
                     case 8:
                         intent = new Intent(MainActivity.this, KeypadActivity.class);
                         break;
+                    case 9:
+                        intent = new Intent(MainActivity.this, SlideMenuActivity.class);
+                        break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + titles.get(position));
                 }
@@ -99,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
         titles.add(new ActivityBean(5, "实现类似QQ微信阻尼回调效果", JunkerReboundActivity.class));
         titles.add(new ActivityBean(6, "ScrollView+阻尼回调效果", ScrollReboundActivity.class));
         titles.add(new ActivityBean(7, "流式动态布局", FlowActivity.class));
-        titles.add(new ActivityBean(8, "ViewGroup实现的Keypad", KeypadActivity.class));
+        titles.add(new ActivityBean(8, "继承ViewGroup实现的Keypad", KeypadActivity.class));
+        titles.add(new ActivityBean(9, "继承ViewGroup实现的SlideMenu", KeypadActivity.class));
     }
 
     private void initAdapter() {

@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">自定义View</string>
+    <string name="text_read">已读</string>
+    <string name="text_top">置顶</string>
+    <string name="text_delete">删除</string>
 </resources>

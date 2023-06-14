@@ -36,9 +36,17 @@
 
     <declare-styleable name="KeypadView">
         <attr name="itemMargin" format="dimension" />
-        <attr name="keyTextColor" format="color"/>
-        <attr name="textSize" format="dimension"/>
-        <attr name="itemPressBg" format="color"/>
-        <attr name="itemNormalBg" format="color"/>
+        <attr name="keyTextColor" format="color" />
+        <attr name="textSize" format="dimension" />
+        <attr name="itemPressBg" format="color" />
+        <attr name="itemNormalBg" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="SlideMenuView">
+        <attr name="function" format="flags">
+            <flag name="delete" value="0x30" />
+            <flag name="read" value="0x50" />
+            <flag name="top" value="0x03" />
+        </attr>
     </declare-styleable>
 </resources>
