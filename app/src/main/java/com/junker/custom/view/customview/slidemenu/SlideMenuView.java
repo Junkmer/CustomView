@@ -30,17 +30,16 @@ public class SlideMenuView extends ViewGroup implements View.OnClickListener {
     private TextView mReadTv;
     private TextView mTopTv;
     private TextView mDeleteTv;
-    private int offsetX;
     private float downX;
-    private float moveX;
-    private Scroller mScroller;
+    private final Scroller mScroller;
 
     //是否打开
     private boolean isOpen;
     private Direction mCurrentDirect = Direction.NOME;
 
-    private int mMaxDuration = 800;
+    private int mMaxDuration = 600;
     private int mMinDuration = 300;
+    private float mInterceptDownX;
 
     enum Direction {
         LEFT, RIGHT, NOME
@@ -114,24 +113,30 @@ public class SlideMenuView extends ViewGroup implements View.OnClickListener {
         mReadTv = mEditView.findViewById(R.id.read_tv);
         mTopTv = mEditView.findViewById(R.id.top_tv);
         mDeleteTv = mEditView.findViewById(R.id.delete_tv);
-//        mReadTv.setOnClickListener(this);
-//        mTopTv.setOnClickListener(this);
-//        mDeleteTv.setOnClickListener(this);
+        mReadTv.setOnClickListener(this);
+        mTopTv.setOnClickListener(this);
+        mDeleteTv.setOnClickListener(this);
     }
 
     @Override
-    public void onClick(View v) {
-        if (mOnEditClickListener == null) {
-            Log.d(TAG, "mOnEditClickListener is null...");
-            return;
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        int action = ev.getAction();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                mInterceptDownX = ev.getX();
+                downX = ev.getX();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float mOffsetX = ev.getX() - mInterceptDownX;
+                if (Math.abs(mOffsetX) > 0) {
+                    return true;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                break;
         }
-        if (v == mReadTv) {
-            mOnEditClickListener.onReadClick();
-        } else if (v == mTopTv) {
-            mOnEditClickListener.onTopClick();
-        } else if (v == mDeleteTv) {
-            mOnEditClickListener.onDeleteClick();
-        }
+        return super.onInterceptTouchEvent(ev);
     }
 
     @Override
@@ -152,21 +157,29 @@ public class SlideMenuView extends ViewGroup implements View.OnClickListener {
         int action = event.getAction();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                downX = event.getX();
                 break;
             case MotionEvent.ACTION_MOVE:
                 int scrollX = getScrollX();
-                moveX = event.getX();
-                offsetX = (int) (moveX - downX);
+                float moveX = event.getX();
+                int offsetX = (int) (moveX - downX);
 
-                if (offsetX > 0) {
-                    mCurrentDirect = Direction.RIGHT;
-                } else {
-                    mCurrentDirect = Direction.LEFT;
+                if (isOpen) {//打开状态
+                    if (offsetX < 0) {
+                        mCurrentDirect = Direction.LEFT;
+                    } else {
+                        mCurrentDirect = Direction.RIGHT;
+                    }
+                }else {//关闭状态
+                    if (offsetX > 0) {
+                        mCurrentDirect = Direction.RIGHT;
+                    } else {
+                        mCurrentDirect = Direction.LEFT;
+                    }
                 }
 
                 //判断是否滑动到边界
                 int resultScrollX = -offsetX + scrollX;
+
                 if (resultScrollX <= 0 || resultScrollX >= mEditView.getMeasuredWidth()) {
                     scrollBy(0, 0);
                 } else {
@@ -203,33 +216,34 @@ public class SlideMenuView extends ViewGroup implements View.OnClickListener {
                         close();
                     }
                 }
-                invalidate();
                 break;
         }
         return true;
     }
 
-    private void open() {
+    public void open() {
         //显示
         int dx = mEditView.getMeasuredWidth() - getScrollX();
         int duration = (int) (dx / (mEditView.getMeasuredWidth() * 4 / 5f) * mMaxDuration);
         int absDuration = Math.abs(duration);
-        if (absDuration < mMinDuration){
+        if (absDuration < mMinDuration) {
             absDuration = mMinDuration;
         }
         mScroller.startScroll(getScrollX(), 0, dx, 0, absDuration);
+        invalidate();
         isOpen = true;
     }
 
-    private void close() {
+    public void close() {
         //隐藏"
         int dx = -getScrollX();
         int duration = (int) (dx / (mEditView.getMeasuredWidth() * 4 / 5f) * mMaxDuration);
         int absDuration = Math.abs(duration);
-        if (absDuration < mMinDuration){
+        if (absDuration < mMinDuration) {
             absDuration = mMinDuration;
         }
         mScroller.startScroll(getScrollX(), 0, dx, 0, absDuration);
+        invalidate();
         isOpen = false;
     }
 
@@ -238,6 +252,26 @@ public class SlideMenuView extends ViewGroup implements View.OnClickListener {
         if (mScroller.computeScrollOffset()) {
             scrollTo(mScroller.getCurrX(), 0);
             invalidate();
+        }
+    }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (mOnEditClickListener == null) {
+            Log.d(TAG, "mOnEditClickListener is null...");
+            return;
+        }
+        close();
+        if (v == mReadTv) {
+            mOnEditClickListener.onReadClick();
+        } else if (v == mTopTv) {
+            mOnEditClickListener.onTopClick();
+        } else if (v == mDeleteTv) {
+            mOnEditClickListener.onDeleteClick();
         }
     }
 

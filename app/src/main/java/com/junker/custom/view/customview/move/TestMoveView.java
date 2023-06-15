@@ -44,7 +44,7 @@ public class TestMoveView extends AppCompatButton {
     private float currentX;
     private float currentY;
 
-    //用于控制设置 onClickListener 时间后，移动view 之后不再触发 点击事件
+    //用于控制设置 onClickListener 事件后，移动view 之后不再触发 点击事件
     private long mDownTouchTime;
     private long mUpTouchTime;
 
@@ -120,19 +120,6 @@ public class TestMoveView extends AppCompatButton {
         boolean b = super.dispatchTouchEvent(event);
         Log.i(TAG, "dispatchTouchEvent -> super.dispatchTouchEvent(event) is " + b);
         return b;
-    }
-
-    private void logcat(MotionEvent event){
-        Log.e(TAG, "dispatchTouchEvent \nleft = " + getLeft() + "    top = " + getTop() + "    right = " + getRight() + "    bottom = " + getBottom() + "\n"
-                + "getX = " + event.getX() + "\n"
-                + "getY = " + event.getY() + "\n"
-                + "getRawX = " + event.getRawX() + "\n"
-                + "getRawY = " + event.getRawY() + "\n"
-                + "getScrollX = " + getScrollX() + "\n"
-                + "getScrollY = " + getScrollY() + "\n"
-                + "getTranslationX = " + getTranslationX() + "\n"
-                + "getTranslationY = " + getTranslationY() + "\n"
-        );
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -299,5 +286,18 @@ public class TestMoveView extends AppCompatButton {
                 //TODO:不做处理
                 break;
         }
+    }
+
+    private void logcat(MotionEvent event){
+        Log.e(TAG, "dispatchTouchEvent \nleft = " + getLeft() + "    top = " + getTop() + "    right = " + getRight() + "    bottom = " + getBottom() + "\n"
+                + "getX = " + event.getX() + "\n"
+                + "getY = " + event.getY() + "\n"
+                + "getRawX = " + event.getRawX() + "\n"
+                + "getRawY = " + event.getRawY() + "\n"
+                + "getScrollX = " + getScrollX() + "\n"
+                + "getScrollY = " + getScrollY() + "\n"
+                + "getTranslationX = " + getTranslationX() + "\n"
+                + "getTranslationY = " + getTranslationY() + "\n"
+        );
     }
 }
