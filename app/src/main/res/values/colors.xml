@@ -18,4 +18,10 @@
     <color name="text_grey_press">#99888585</color>
     <color name="key_item_color">#383838</color>
     <color name="key_item_press_color">#181818</color>
+
+    <!--  watch face color list  -->
+    <color name="second_default_color">#ff0000</color>
+    <color name="min_default_color">#00ff00</color>
+    <color name="hour_default_color">#0000ff</color>
+    <color name="scale_default_color">#ffffff</color>
 </resources>

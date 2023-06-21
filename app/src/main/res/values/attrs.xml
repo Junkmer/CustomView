@@ -49,4 +49,14 @@
             <flag name="top" value="0x03" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="WatchFaceView">
+        <attr name="secondColor" format="color" />
+        <attr name="minColor" format="color" />
+        <attr name="hourColor" format="color" />
+        <attr name="scaleColor" format="color" />
+        <attr name="faceBackground" format="reference" />
+        <attr name="scaleShow" format="boolean" />
+        <attr name="centerRadius" format="integer" />
+    </declare-styleable>
 </resources>

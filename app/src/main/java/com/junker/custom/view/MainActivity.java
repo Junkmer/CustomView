@@ -31,6 +31,7 @@ import com.junker.custom.view.customview.rebound.JunkerReboundActivity;
 import com.junker.custom.view.customview.rebound.ReboundActivity;
 import com.junker.custom.view.customview.rebound.ScrollReboundActivity;
 import com.junker.custom.view.customview.slidemenu.SlideMenuActivity;
+import com.junker.custom.view.customview.watchface.WatchFaceActivity;
 
 import java.security.Permission;
 import java.util.ArrayList;
@@ -86,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
                     case 9:
                         intent = new Intent(MainActivity.this, SlideMenuActivity.class);
                         break;
+                    case 10:
+                        intent = new Intent(MainActivity.this, WatchFaceActivity.class);
+                        break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + titles.get(position));
                 }
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         titles.add(new ActivityBean(7, "流式动态布局", FlowActivity.class));
         titles.add(new ActivityBean(8, "继承ViewGroup实现的Keypad", KeypadActivity.class));
         titles.add(new ActivityBean(9, "继承ViewGroup实现的SlideMenu", KeypadActivity.class));
+        titles.add(new ActivityBean(10, "继承View实现的WatchFace", WatchFaceActivity.class));
     }
 
     private void initAdapter() {

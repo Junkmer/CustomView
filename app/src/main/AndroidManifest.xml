@@ -22,6 +22,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.自定义View">
         <activity
+            android:name=".customview.watchface.WatchFaceActivity"
+            android:exported="false" />
+        <activity
             android:name=".customview.slidemenu.SlideMenuActivity"
             android:exported="false" />
         <activity
