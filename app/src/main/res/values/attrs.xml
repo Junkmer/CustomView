@@ -59,4 +59,8 @@
         <attr name="scaleShow" format="boolean" />
         <attr name="centerRadius" format="integer" />
     </declare-styleable>
+    
+    <declare-styleable name="PieChartView">
+        <attr name="tipTextSize" format="dimension"/>
+    </declare-styleable>
 </resources>
