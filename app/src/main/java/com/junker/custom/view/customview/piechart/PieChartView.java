@@ -37,18 +37,16 @@ public class PieChartView extends View {
                     Color.BLUE, Color.RED, Color.DKGRAY,
                     Color.GREEN, Color.CYAN, Color.LTGRAY,
                     Color.MAGENTA, Color.GRAY, Color.WHITE,
-                    Color.YELLOW, Color.BLACK, Color.BLACK
+                    Color.YELLOW, Color.BLACK
             };
 
     private List<PieChartBean> mListPieChat;
     private List<String> mListTitle;
 
     private float mTextSize;
-    private int widthPixels;
+    private final int widthPixels;
     private int centerX;
     private int centerY;
-    private int mWidth;
-    private int mHeight;
     private int mRadius;
     private Paint mPiePaint;
     private List<SectorsData> mListSector;
@@ -96,7 +94,7 @@ public class PieChartView extends View {
         int contentMeasureHeight;
         if (widthMode == MeasureSpec.EXACTLY) {
             int widthDp = DensityUtil.px2dip(widthSize);
-            int maxWidth = Math.max(widthDp, widthPixels / 2) - getPaddingLeft() - getPaddingRight();
+            int maxWidth = Math.max(widthDp, widthPixels / 3) - getPaddingLeft() - getPaddingRight();
             contentMeasureWidth = MeasureSpec.makeMeasureSpec(maxWidth, MeasureSpec.EXACTLY);
         } else {
             contentMeasureWidth = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.AT_MOST);
@@ -126,9 +124,9 @@ public class PieChartView extends View {
         mListSector.add(new SectorsData("红队", 40f));
         mListSector.add(new SectorsData("蓝队", 3f));
         mListSector.add(new SectorsData("黄队", 20f));
-        mListSector.add(new SectorsData("绿队", 60f));
-        mListSector.add(new SectorsData("紫队", 100f));
-        mListSector.add(new SectorsData("白队", 15f));
+        mListSector.add(new SectorsData("绿队", 55f));
+        mListSector.add(new SectorsData("紫队", 80f));
+        mListSector.add(new SectorsData("白队", 50f));
         mListSector.add(new SectorsData("黑队", 7f));
 
         //对数据进行排序
@@ -151,13 +149,12 @@ public class PieChartView extends View {
             if (sectorsData.getProportion() == maxProportion) {
                 skewingLength = 30f;
             } else {
-                skewingLength = 10f;
+                skewingLength = 3f;
             }
 
             itemStartAngle += itemSweepAngle;
             itemSweepAngle = sectorsData.getProportion() / totalCount * 360f;
             PieChartBean chartBean = calculateDirectionCord(itemStartAngle, itemSweepAngle, skewingLength, DEFAULT_COLORS[i]);
-            Log.e(TAG,"chartBean == > "+chartBean.toString());
             mListPieChat.add(chartBean);
 
             mListTitle.add(sectorsData.getTitle());
@@ -170,45 +167,32 @@ public class PieChartView extends View {
     private PieChartBean calculateDirectionCord(float startAngle, float sweepAngle, float skewingLength, int color) {
         PieChartBean chartBean = new PieChartBean();
 
-        //扇形中心角度 = startAngle(起始角度) + sweepAngle(扫过的角度)/2
-        float centerAngle = startAngle + sweepAngle / 2;
-        //角度转弧度： Math.PI/180 * 角度
-        //已知 skewingLength 为斜边，根据正弦、余弦函数，可得出 x轴与y轴偏移量
-        float skewingX = 0;
-        float skewingY = 0;
-//        float skewingX = (float) (skewingLength * Math.sin(centerAngle * Math.PI / 180));
-//        float skewingY = (float) (skewingLength * Math.cos(centerAngle * Math.PI / 180));
-//        Log.e(TAG, "skewingX == > " + skewingX);
-//        Log.e(TAG, "skewingY == > " + skewingY);
-
-
-//        float offsetX = (mWidth - mRadius) / 2f + skewingX;
-//        float offsetY = (mHeight - mRadius) / 2f + skewingY;
-//
-//        chartBean.setLeft(offsetX);
-//        chartBean.setTop(offsetY);
-//        chartBean.setRight(mRadius + offsetX);
-//        chartBean.setBottom(mRadius + offsetY);
-
-        chartBean.setLeft(centerX - mRadius);
-        chartBean.setTop(centerY - mRadius);
-        chartBean.setRight(centerX + mRadius);
-        chartBean.setBottom(centerY + mRadius);
-
         chartBean.setStartAngle(startAngle);
         chartBean.setSweepAngle(sweepAngle);
         chartBean.setColor(color);
+
+        //扇形中心角度 = startAngle(起始角度) + sweepAngle(扫过的角度)/2
+        float centerAngle = startAngle + sweepAngle / 2f;
+        //角度转弧度： Math.PI/180 * 角度
+        //已知 skewingLength 为斜边，根据正弦、余弦函数，可得出 x轴与y轴偏移量
+        //以水平X轴为起始角度向下滑扫，因此 x坐标 = Math.con(斜边长度 * Math.PI / 180); y坐标 = Math.sin(斜边长度 * Math.PI / 180);
+        float skewingX = (float) (skewingLength * Math.cos(centerAngle * Math.PI / 180));
+        float skewingY = (float) (skewingLength * Math.sin(centerAngle * Math.PI / 180));
+
+        chartBean.setLeft(centerX - mRadius + skewingX);
+        chartBean.setTop(centerY - mRadius + skewingY);
+        chartBean.setRight(centerX + mRadius + skewingX);
+        chartBean.setBottom(centerY + mRadius + skewingY);
+
         return chartBean;
     }
 
     private void initRectF() {
-        mWidth = getMeasuredWidth();
-        mHeight = getMeasuredHeight();
+        int mWidth = getMeasuredWidth();
+        int mHeight = getMeasuredHeight();
         centerX = mWidth / 2;
         centerY = mHeight / 2;
-//        Log.e(TAG, "centerX == >" + centerX);
-//        Log.e(TAG, "centerY == >" + centerY);
-        mRadius = (int) (Math.min(mWidth, mHeight) * 0.80f);
+        mRadius = (int) (Math.min(centerX, centerY) * 0.80f);
     }
 
     private void initPaint() {
@@ -238,6 +222,7 @@ public class PieChartView extends View {
          * Paint paint：设置画笔对象的属性
          * drawArc(RectF oval, float startAngle, float sweepAngle, boolean useCenter,Paint paint)
          */
+
         for (PieChartBean chartBean : mListPieChat) {
             mPiePaint.setColor(chartBean.getColor());
             canvas.drawArc(chartBean.getLeft(), chartBean.getTop(), chartBean.getRight(), chartBean.getBottom(),
