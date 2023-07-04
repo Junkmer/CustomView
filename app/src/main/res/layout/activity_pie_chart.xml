@@ -9,9 +9,11 @@
 
     <com.junker.custom.view.customview.piechart.PieChartView
         android:id="@+id/pie_chart_view"
-        android:layout_width="900dp"
+        android:layout_width="1000dp"
         android:layout_height="700dp"
         android:background="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

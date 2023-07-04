@@ -1,24 +1,24 @@
 package com.junker.custom.view.customview.piechart;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 
 import com.junker.custom.view.R;
 import com.junker.custom.view.utils.DensityUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Currency;
 import java.util.List;
 
 /**
@@ -40,8 +40,9 @@ public class PieChartView extends View {
                     Color.YELLOW, Color.BLACK
             };
 
-    private List<PieChartBean> mListPieChat;
-    private List<String> mListTitle;
+    private List<PieChartBean> mListPieChart;
+    private List<LineChartBean> mListLineChart;
+    private List<TextChartBean> mListTextChart;
 
     private float mTextSize;
     private final int widthPixels;
@@ -74,6 +75,9 @@ public class PieChartView extends View {
     private void initAttr(Context context, @Nullable AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PieChartView);
         mTextSize = a.getDimension(R.styleable.PieChartView_tipTextSize, -1);
+        if (mTextSize == -1) {
+            mTextSize = DensityUtil.dip2px(15);
+        }
         a.recycle();
     }
 
@@ -118,8 +122,6 @@ public class PieChartView extends View {
 
     private void initData() {
         mListSector = new ArrayList<>();
-        mListPieChat = new ArrayList<>();
-        mListTitle = new ArrayList<>();
 
         mListSector.add(new SectorsData("红队", 40f));
         mListSector.add(new SectorsData("蓝队", 3f));
@@ -131,6 +133,159 @@ public class PieChartView extends View {
 
         //对数据进行排序
         Collections.sort(mListSector);
+    }
+
+    /**
+     *
+     */
+
+    private void initRectF() {
+        int mWidth = getMeasuredWidth();
+        int mHeight = getMeasuredHeight();
+        centerX = mWidth / 2;
+        centerY = mHeight / 2;
+        mRadius = (int) (Math.min(centerX, centerY) * 0.80f);
+    }
+
+    private void initPaint() {
+        mPiePaint = new Paint();
+        mPiePaint.setColor(Color.BLUE);
+        mPiePaint.setStyle(Paint.Style.FILL);
+        mPiePaint.setStrokeWidth(5);
+        mPiePaint.setAntiAlias(true);
+        mPiePaint.setStrokeCap(Paint.Cap.ROUND);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        //绘制扇形图
+        drawPieChart(canvas);
+        //绘制折线
+        drawLine(canvas);
+        //绘制文本
+        drawText(canvas);
+    }
+
+    private void drawText(Canvas canvas) {
+        canvas.save();
+
+        mPiePaint.setTextSize(mTextSize);
+
+        mListTextChart = calculateTextChartDatas();
+
+        for (TextChartBean bean : mListTextChart) {
+            mPiePaint.setTextAlign(bean.getPaintAlign());
+            float textCenterY = bean.getStartY() + mTextSize / 2;
+            canvas.drawText(bean.getText(), bean.getStartX(), textCenterY, mPiePaint);
+        }
+
+        canvas.restore();
+    }
+
+    private List<TextChartBean> calculateTextChartDatas() {
+        List<TextChartBean> textChartBeans = new ArrayList<>();
+
+        for (int i = 0; i < mListSector.size(); i++) {
+            TextChartBean bean = new TextChartBean();
+
+            LineChartBean lineChartBean = mListLineChart.get(i);
+            bean.setStartX(lineChartBean.getEndX());
+            bean.setStartY(lineChartBean.getEndY());
+            bean.setText(mListSector.get(i).getTitle());
+
+            if (lineChartBean.getStartAngle() > 90 && lineChartBean.getStartAngle() < 270) {
+                bean.setPaintAlign(Paint.Align.RIGHT);
+            } else {
+                bean.setPaintAlign(Paint.Align.LEFT);
+            }
+
+            textChartBeans.add(bean);
+        }
+
+        return textChartBeans;
+    }
+
+    private void drawLine(Canvas canvas) {
+        canvas.save();
+        mPiePaint.setColor(DEFAULT_COLORS[7]);//灰色
+
+        mListLineChart = calculateLineChartDatas();
+
+        for (LineChartBean bean : mListLineChart) {
+            Log.e(TAG, bean.toString());
+            //绘制[起始坐标]至[转折坐标]的线
+            canvas.drawLine(bean.getStartX(), bean.getStartY(), bean.getBendX(), bean.getBendY(), mPiePaint);
+            //[转折坐标]至[结束坐标]的线
+            canvas.drawLine(bean.getBendX(), bean.getBendY(), bean.getEndX(), bean.getEndY(), mPiePaint);
+        }
+
+        canvas.restore();
+    }
+
+    private List<LineChartBean> calculateLineChartDatas() {
+        List<LineChartBean> lineChartBeans = new ArrayList<>();
+
+        for (int i = 0; i < mListSector.size(); i++) {
+            LineChartBean bean = new LineChartBean();
+
+            PieChartBean chartBean = mListPieChart.get(i);
+
+            //起始坐标
+            float startX = (float) (mRadius * Math.cos(chartBean.getMiddleAngle() * Math.PI / 180));
+            float startY = (float) (mRadius * Math.sin(chartBean.getMiddleAngle() * Math.PI / 180));
+            bean.setStartX(chartBean.getCenterX() + startX);
+            bean.setStartY(chartBean.getCenterY() + startY);
+
+            //转折坐标
+            float bendX = (float) ((mRadius + 50) * Math.cos(chartBean.getMiddleAngle() * Math.PI / 180));
+            float bendY = (float) ((mRadius + 50) * Math.sin(chartBean.getMiddleAngle() * Math.PI / 180));
+            bean.setBendX(chartBean.getCenterX() + bendX);
+            bean.setBendY(chartBean.getCenterY() + bendY);
+
+            //结束坐标
+            float endX;
+            if (chartBean.getMiddleAngle() > 90 && chartBean.getMiddleAngle() < 270) {
+                endX = centerX - mRadius - 100;
+            } else {
+                endX = centerX + mRadius + 100;
+            }
+            float endY = (float) ((mRadius + 50) * Math.sin(chartBean.getMiddleAngle() * Math.PI / 180));
+            bean.setEndX(endX);
+            bean.setEndY(chartBean.getCenterY() + endY);
+            bean.setStartAngle(chartBean.getMiddleAngle());
+
+            lineChartBeans.add(bean);
+        }
+
+        return lineChartBeans;
+    }
+
+    private void drawPieChart(Canvas canvas) {
+        canvas.save();//save()方法需要配合restore()方法使用
+
+        mListPieChart = calculatePieChartDatas();//初始化数据
+
+        /*
+         * float left, float top, float right, float bottom：绘制区域
+         * float startAngle：设置圆弧是从哪个角度来顺时针绘画的
+         * float sweepAngle：设置圆弧扫过的角度
+         * boolean useCenter：设置在绘画圆弧时，是否经过圆心
+         * Paint paint：设置画笔对象的属性
+         * drawArc(RectF oval, float startAngle, float sweepAngle, boolean useCenter,Paint paint)
+         */
+
+        for (PieChartBean bean : mListPieChart) {
+            mPiePaint.setColor(bean.getColor());
+            canvas.drawArc(bean.getLeft(), bean.getTop(), bean.getRight(), bean.getBottom(),
+                    bean.getStartAngle(), bean.getSweepAngle(), true, mPiePaint);
+        }
+
+        canvas.restore();
+    }
+
+    private List<PieChartBean> calculatePieChartDatas() {
+
+        List<PieChartBean> pieChartBeans = new ArrayList<>();
 
         float totalCount = 0;
         float maxProportion = 0;
@@ -155,10 +310,10 @@ public class PieChartView extends View {
             itemStartAngle += itemSweepAngle;
             itemSweepAngle = sectorsData.getProportion() / totalCount * 360f;
             PieChartBean chartBean = calculateDirectionCord(itemStartAngle, itemSweepAngle, skewingLength, DEFAULT_COLORS[i]);
-            mListPieChat.add(chartBean);
-
-            mListTitle.add(sectorsData.getTitle());
+            pieChartBeans.add(chartBean);
         }
+
+        return pieChartBeans;
     }
 
     /**
@@ -173,6 +328,7 @@ public class PieChartView extends View {
 
         //扇形中心角度 = startAngle(起始角度) + sweepAngle(扫过的角度)/2
         float centerAngle = startAngle + sweepAngle / 2f;
+        chartBean.setMiddleAngle(centerAngle);
         //角度转弧度： Math.PI/180 * 角度
         //已知 skewingLength 为斜边，根据正弦、余弦函数，可得出 x轴与y轴偏移量
         //以水平X轴为起始角度向下滑扫，因此 x坐标 = Math.con(斜边长度 * Math.PI / 180); y坐标 = Math.sin(斜边长度 * Math.PI / 180);
@@ -183,52 +339,10 @@ public class PieChartView extends View {
         chartBean.setTop(centerY - mRadius + skewingY);
         chartBean.setRight(centerX + mRadius + skewingX);
         chartBean.setBottom(centerY + mRadius + skewingY);
+        chartBean.setCenterX(centerX + skewingX);
+        chartBean.setCenterY(centerY + skewingY);
 
         return chartBean;
     }
 
-    private void initRectF() {
-        int mWidth = getMeasuredWidth();
-        int mHeight = getMeasuredHeight();
-        centerX = mWidth / 2;
-        centerY = mHeight / 2;
-        mRadius = (int) (Math.min(centerX, centerY) * 0.80f);
-    }
-
-    private void initPaint() {
-        mPiePaint = new Paint();
-        mPiePaint.setColor(Color.BLUE);
-        mPiePaint.setStyle(Paint.Style.FILL);
-        mPiePaint.setAntiAlias(true);
-        mPiePaint.setStrokeCap(Paint.Cap.ROUND);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        //绘制扇形图
-        drawPieChart(canvas);
-        //绘制折线
-        //绘制文本
-    }
-
-    private void drawPieChart(Canvas canvas) {
-//        canvas.save();//save()方法需要配合restore()方法使用
-
-        /*
-         * float left, float top, float right, float bottom：绘制区域
-         * float startAngle：设置圆弧是从哪个角度来顺时针绘画的
-         * float sweepAngle：设置圆弧扫过的角度
-         * boolean useCenter：设置在绘画圆弧时，是否经过圆心
-         * Paint paint：设置画笔对象的属性
-         * drawArc(RectF oval, float startAngle, float sweepAngle, boolean useCenter,Paint paint)
-         */
-
-        for (PieChartBean chartBean : mListPieChat) {
-            mPiePaint.setColor(chartBean.getColor());
-            canvas.drawArc(chartBean.getLeft(), chartBean.getTop(), chartBean.getRight(), chartBean.getBottom(),
-                    chartBean.getStartAngle(), chartBean.getSweepAngle(), true, mPiePaint);
-        }
-
-//        canvas.restore();
-    }
 }

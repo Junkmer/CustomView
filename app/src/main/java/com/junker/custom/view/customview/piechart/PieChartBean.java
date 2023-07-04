@@ -14,7 +14,10 @@ public class PieChartBean {
     private float top;
     private float right;
     private float bottom;
+    private float centerX;
+    private float centerY;
     private float startAngle;       //设置圆弧是从哪个角度来顺时针绘画的
+    private float middleAngle;      //起始角度与圆弧扫过的角度中间Angle
     private float sweepAngle;       //设置圆弧扫过的角度
     private int color;              //设置画笔的颜色
 
@@ -50,12 +53,36 @@ public class PieChartBean {
         this.bottom = bottom;
     }
 
+    public float getCenterX() {
+        return centerX;
+    }
+
+    public void setCenterX(float centerX) {
+        this.centerX = centerX;
+    }
+
+    public float getCenterY() {
+        return centerY;
+    }
+
+    public void setCenterY(float centerY) {
+        this.centerY = centerY;
+    }
+
     public float getStartAngle() {
         return startAngle;
     }
 
     public void setStartAngle(float startAngle) {
         this.startAngle = startAngle;
+    }
+
+    public float getMiddleAngle() {
+        return middleAngle;
+    }
+
+    public void setMiddleAngle(float middleAngle) {
+        this.middleAngle = middleAngle;
     }
 
     public float getSweepAngle() {
@@ -81,7 +108,10 @@ public class PieChartBean {
                 ", top=" + top +
                 ", right=" + right +
                 ", bottom=" + bottom +
+                ", centerX=" + centerX +
+                ", centerY=" + centerY +
                 ", startAngle=" + startAngle +
+                ", middleAngle=" + middleAngle +
                 ", sweepAngle=" + sweepAngle +
                 ", color=" + color +
                 '}';
