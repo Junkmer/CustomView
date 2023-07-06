@@ -356,17 +356,18 @@ public class PieChartView extends View {
         }
         int rightBottomListSize = rightBottomList.size();
         for (int i = 0; i < rightBottomListSize; i++) {
-            LineChartBean item = rightBottomList.get(i);
-            currentY = item.getBendY();
-            if (chartBeans.get(rightClosestToHorizonAnglePosition).getBendY() != currentY) {
-                float offset = Math.abs(currentY - beforeY) - mTextSize;
-                if (offset < 10) {//10 表示两个title内容的间距
-                    currentY = currentY - (10 - offset);
-                    chartBeans.get(i).setBendY(currentY);
-                    chartBeans.get(i).setEndY(currentY);
-                }
-                beforeY = currentY;
+            currentY = rightBottomList.get(i).getBendY();
+            if (currentY == beforeY) {
+                continue;
             }
+            float offset = currentY - beforeY - mTextSize;
+            if (offset < 10) {//10 表示两个title内容的间距
+                currentY = currentY + (10 - offset);
+                chartBeans.get(i).setBendY(currentY);
+                chartBeans.get(i).setEndY(currentY);
+            }
+            beforeY = currentY;
+
         }
 
         //------------- 处理左下区域 -----------//
@@ -374,59 +375,60 @@ public class PieChartView extends View {
             beforeY = leftClosestToBean.getBendY();
         }
         int leftBottomListSize = leftBottomList.size();
-        for (int i = 0; i < leftBottomList.size(); i++) {//处理左下区域
+        for (int i = 0; i < leftBottomList.size(); i++) {
             int position = leftBottomListSize - 1 - i;
-            LineChartBean item = leftBottomList.get(position);
-            currentY = item.getBendY();
-            if (chartBeans.get(leftClosestToHorizonAnglePosition).getBendY() != currentY) {
-                float offset = Math.abs(currentY - beforeY) - mTextSize;
-                if (offset < 10) {//10 表示两个title内容的间距
-                    currentY = currentY - (10 - offset);
-                    chartBeans.get(rightBottomListSize + position).setBendY(currentY);
-                    chartBeans.get(rightBottomListSize + position).setEndY(currentY);
-                }
-                beforeY = currentY;
+            currentY = leftBottomList.get(position).getBendY();
+            if (currentY == beforeY) {
+                continue;
             }
+            float offset = currentY - beforeY - mTextSize;
+            if (offset < 10) {//10 表示两个title内容的间距
+                currentY = currentY + (10 - offset);
+                chartBeans.get(rightBottomListSize + position).setBendY(currentY);
+                chartBeans.get(rightBottomListSize + position).setEndY(currentY);
+            }
+            beforeY = currentY;
         }
 
         //------------- 处理左上区域 -----------//
         if (leftClosestToBean != null) {
             beforeY = leftClosestToBean.getBendY();
         }
-        int leftTopListSize = leftBottomList.size();
-        for (int i = 0; i < leftTopListSize; i++) {//处理左上区域
-            LineChartBean item = leftBottomList.get(i);
-            currentY = item.getBendY();
-            if (chartBeans.get(leftClosestToHorizonAnglePosition).getBendY() != currentY) {
-                float offset = Math.abs(currentY - beforeY) - mTextSize;
-                if (offset < 10) {//10 表示两个title内容的间距
-                    currentY = currentY - (10 - offset);
-                    int position = rightBottomListSize + leftBottomListSize + i;
-                    chartBeans.get(position).setBendY(currentY);
-                    chartBeans.get(position).setEndY(currentY);
-                }
-                beforeY = currentY;
+        int leftTopListSize = leftTopList.size();
+        for (int i = 0; i < leftTopListSize; i++) {
+            currentY = leftTopList.get(i).getBendY();
+            if (currentY == beforeY) {
+                continue;
             }
+            float offset = beforeY - currentY - mTextSize;
+            if (offset < 10) {//10 表示两个title内容的间距
+                currentY = currentY - (10 - offset);
+                int position = rightBottomListSize + leftBottomListSize + i;
+                chartBeans.get(position).setBendY(currentY);
+                chartBeans.get(position).setEndY(currentY);
+            }
+            beforeY = currentY;
         }
+
 
         //-------------处理右上区域 -----------//
         if (rightClosestToBean != null) {
             beforeY = rightClosestToBean.getBendY();
         }
         int rightTopListSize = rightTopList.size();
-        for (int i = 0; i < rightTopListSize; i++) {//处理右上区域
+        for (int i = 0; i < rightTopListSize; i++) {
             int position = rightTopListSize - 1 - i;
-            LineChartBean item = rightTopList.get(position);
-            currentY = item.getBendY();
-            if (chartBeans.get(rightClosestToHorizonAnglePosition).getBendY() != currentY) {
-                float offset = Math.abs(currentY - beforeY) - mTextSize;
-                if (offset < 10) {//10 表示两个title内容的间距
-                    currentY = currentY - (10 - offset);
-                    chartBeans.get(rightBottomListSize + leftBottomListSize + leftTopListSize + position).setBendY(currentY);
-                    chartBeans.get(rightBottomListSize + leftBottomListSize + leftTopListSize + position + position).setEndY(currentY);
-                }
-                beforeY = currentY;
+            currentY = rightTopList.get(position).getBendY();
+            if (currentY == beforeY) {
+                continue;
             }
+            float offset = beforeY - currentY - mTextSize;
+            if (offset < 10) {//10 表示两个title内容的间距
+                currentY = currentY - (10 - offset);
+                chartBeans.get(rightBottomListSize + leftBottomListSize + leftTopListSize + position).setBendY(currentY);
+                chartBeans.get(rightBottomListSize + leftBottomListSize + leftTopListSize + position).setEndY(currentY);
+            }
+            beforeY = currentY;
         }
     }
 

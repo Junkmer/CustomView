@@ -29,7 +29,7 @@ public class PieChartActivity extends AppCompatActivity {
         mListSector.add(new SectorsData("红队", 3f));
         mListSector.add(new SectorsData("蓝队", 3f));
         mListSector.add(new SectorsData("黑1队", 1f));
-        mListSector.add(new SectorsData("黄队", 300f));
+        mListSector.add(new SectorsData("黄队", 320f));
         mListSector.add(new SectorsData("绿1队", 3f));
         mListSector.add(new SectorsData("绿2队", 3f));
         mListSector.add(new SectorsData("绿3队", 300f));
