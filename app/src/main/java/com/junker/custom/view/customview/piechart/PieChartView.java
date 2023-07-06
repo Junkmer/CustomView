@@ -10,15 +10,14 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentManager;
 
 import com.junker.custom.view.R;
 import com.junker.custom.view.utils.DensityUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Currency;
 import java.util.List;
 
 /**
@@ -30,6 +29,8 @@ import java.util.List;
  */
 public class PieChartView extends View {
     private final static int DEFAULT_HEIGHT_SIZE = 500;
+    private final static int DEFAULT_TEXT_SIZE = DensityUtil.dip2px(13);
+    private final static int DEFAULT_HIGHLIGHT_OFFSET_SIZE = 3;
     private static final String TAG = PieChartActivity.class.getSimpleName();
 
     private final static int[] DEFAULT_COLORS = new int[]
@@ -44,13 +45,17 @@ public class PieChartView extends View {
     private List<LineChartBean> mListLineChart;
     private List<TextChartBean> mListTextChart;
 
-    private float mTextSize;
     private final int widthPixels;
     private int centerX;
     private int centerY;
     private int mRadius;
     private Paint mPiePaint;
-    private List<SectorsData> mListSector;
+    private List<SectorsData> mListSector = new ArrayList<>();
+
+    private int[] mPieChartColor = DEFAULT_COLORS;
+    private float mTextSize;
+    private int mTextAndLineColor;
+    private float mHighlightOffsetSize;
 
     public PieChartView(Context context) {
         this(context, null);
@@ -72,20 +77,20 @@ public class PieChartView extends View {
         initPaint();
     }
 
-    private void initAttr(Context context, @Nullable AttributeSet attrs) {
+    private void initAttr(@NonNull Context context, @Nullable AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PieChartView);
-        mTextSize = a.getDimension(R.styleable.PieChartView_tipTextSize, -1);
-        if (mTextSize == -1) {
-            mTextSize = DensityUtil.dip2px(15);
-        }
+        mTextSize = a.getDimension(R.styleable.PieChartView_tipTextSize, DEFAULT_TEXT_SIZE);
+        mTextAndLineColor = a.getColor(R.styleable.PieChartView_textAndLineColor, getResources().getColor(R.color.black));
+        mHighlightOffsetSize = a.getDimension(R.styleable.PieChartView_highlightOffsetSize, DEFAULT_HIGHLIGHT_OFFSET_SIZE);
+
         a.recycle();
     }
 
     /**
      * 测量
      *
-     * @param widthMeasureSpec
-     * @param heightMeasureSpec
+     * @param widthMeasureSpec  默认宽度
+     * @param heightMeasureSpec 默认高度
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -114,32 +119,42 @@ public class PieChartView extends View {
 
         setMeasuredDimension(contentMeasureWidth, contentMeasureHeight);
 
-        initRectF();
+        initImportantParam();
 
-        //初始化数据
-        initData();
-    }
-
-    private void initData() {
-        mListSector = new ArrayList<>();
-
-        mListSector.add(new SectorsData("红队", 40f));
-        mListSector.add(new SectorsData("蓝队", 3f));
-        mListSector.add(new SectorsData("黄队", 20f));
-        mListSector.add(new SectorsData("绿队", 55f));
-        mListSector.add(new SectorsData("紫队", 80f));
-        mListSector.add(new SectorsData("白队", 50f));
-        mListSector.add(new SectorsData("黑队", 7f));
-
-        //对数据进行排序
-        Collections.sort(mListSector);
     }
 
     /**
-     *
+     * 初始化数据
      */
+    public void initData(List<SectorsData> mList) {
+        if (mList == null) {
+            throw new IllegalArgumentException("mList parameter in the initData method cannot be empty.");
+        }
+        mListSector = mList;
+//        Collections.sort(mListSector);
+        invalidate();//刷新view
+    }
 
-    private void initRectF() {
+    public void addData(SectorsData mData) {
+        mListSector.add(mData);
+        Collections.sort(mListSector);
+        invalidate();//刷新view
+    }
+
+    public void updateData(List<SectorsData> mList) {
+        this.mListSector = mList;
+        Collections.sort(mListSector);
+        invalidate();//刷新view
+    }
+
+    public List<SectorsData> getData() {
+        return mListSector;
+    }
+
+    /**
+     * 初始化绘制图形前的重要参数
+     */
+    private void initImportantParam() {
         int mWidth = getMeasuredWidth();
         int mHeight = getMeasuredHeight();
         centerX = mWidth / 2;
@@ -166,22 +181,29 @@ public class PieChartView extends View {
         drawText(canvas);
     }
 
-    private void drawText(Canvas canvas) {
+    private void drawText(@NonNull Canvas canvas) {
         canvas.save();
 
         mPiePaint.setTextSize(mTextSize);
-
+        mPiePaint.setColor(mTextAndLineColor);
         mListTextChart = calculateTextChartDatas();
 
         for (TextChartBean bean : mListTextChart) {
             mPiePaint.setTextAlign(bean.getPaintAlign());
-            float textCenterY = bean.getStartY() + mTextSize / 2;
-            canvas.drawText(bean.getText(), bean.getStartX(), textCenterY, mPiePaint);
+            float textX = 0;
+            if (bean.getPaintAlign() == Paint.Align.LEFT) {
+                textX = bean.getStartX() + 10;
+            } else if (bean.getPaintAlign() == Paint.Align.RIGHT) {
+                textX = bean.getStartX() - 10;
+            }
+            float textY = bean.getStartY() + mTextSize / 2f;
+            canvas.drawText(bean.getText(), textX, textY, mPiePaint);
         }
 
         canvas.restore();
     }
 
+    @NonNull
     private List<TextChartBean> calculateTextChartDatas() {
         List<TextChartBean> textChartBeans = new ArrayList<>();
 
@@ -205,10 +227,9 @@ public class PieChartView extends View {
         return textChartBeans;
     }
 
-    private void drawLine(Canvas canvas) {
+    private void drawLine(@NonNull Canvas canvas) {
         canvas.save();
-        mPiePaint.setColor(DEFAULT_COLORS[7]);//灰色
-
+        mPiePaint.setColor(mTextAndLineColor);//灰色
         mListLineChart = calculateLineChartDatas();
 
         for (LineChartBean bean : mListLineChart) {
@@ -222,6 +243,7 @@ public class PieChartView extends View {
         canvas.restore();
     }
 
+    @NonNull
     private List<LineChartBean> calculateLineChartDatas() {
         List<LineChartBean> lineChartBeans = new ArrayList<>();
 
@@ -231,16 +253,16 @@ public class PieChartView extends View {
             PieChartBean chartBean = mListPieChart.get(i);
 
             //起始坐标
-            float startX = (float) (mRadius * Math.cos(chartBean.getMiddleAngle() * Math.PI / 180));
-            float startY = (float) (mRadius * Math.sin(chartBean.getMiddleAngle() * Math.PI / 180));
-            bean.setStartX(chartBean.getCenterX() + startX);
-            bean.setStartY(chartBean.getCenterY() + startY);
+            float startOffsetX = (float) (mRadius * Math.cos(chartBean.getMiddleAngle() * Math.PI / 180));
+            float startOffsetY = (float) (mRadius * Math.sin(chartBean.getMiddleAngle() * Math.PI / 180));
+            bean.setStartX(chartBean.getCenterX() + startOffsetX);
+            bean.setStartY(chartBean.getCenterY() + startOffsetY);
 
             //转折坐标
-            float bendX = (float) ((mRadius + 50) * Math.cos(chartBean.getMiddleAngle() * Math.PI / 180));
-            float bendY = (float) ((mRadius + 50) * Math.sin(chartBean.getMiddleAngle() * Math.PI / 180));
-            bean.setBendX(chartBean.getCenterX() + bendX);
-            bean.setBendY(chartBean.getCenterY() + bendY);
+            float bendOffsetX = (float) ((mRadius + 50) * Math.cos(chartBean.getMiddleAngle() * Math.PI / 180));
+            float bendOffsetY = (float) ((mRadius + 50) * Math.sin(chartBean.getMiddleAngle() * Math.PI / 180));
+            bean.setBendX(chartBean.getCenterX() + bendOffsetX);
+            bean.setBendY(chartBean.getCenterY() + bendOffsetY);
 
             //结束坐标
             float endX;
@@ -249,18 +271,166 @@ public class PieChartView extends View {
             } else {
                 endX = centerX + mRadius + 100;
             }
-            float endY = (float) ((mRadius + 50) * Math.sin(chartBean.getMiddleAngle() * Math.PI / 180));
+            float endY = bean.getBendY();
             bean.setEndX(endX);
-            bean.setEndY(chartBean.getCenterY() + endY);
+            bean.setEndY(endY);
             bean.setStartAngle(chartBean.getMiddleAngle());
 
             lineChartBeans.add(bean);
         }
 
+        processYDistance(lineChartBeans);
+
         return lineChartBeans;
     }
 
-    private void drawPieChart(Canvas canvas) {
+    /**
+     * 解决 当两条转折线y轴坐标靠的很近时，引起的title内容显示重叠问题
+     */
+    private void processYDistance(List<LineChartBean> chartBeans) {
+
+        int rightClosestToHorizonAnglePosition = -1;//右边最靠经水平线的数据position
+        int leftClosestToHorizonAnglePosition = -1;//左边最靠近说明先的数据position
+
+        float rightBeginAngle = chartBeans.get(0).getStartAngle();
+        float rightEndAngle = chartBeans.get(chartBeans.size() - 1).getStartAngle();
+        if (rightBeginAngle < 90 && rightEndAngle > 270) {
+            rightClosestToHorizonAnglePosition = rightBeginAngle > 360 - rightEndAngle ? chartBeans.size() - 1 : 0;
+        } else {
+            if (rightBeginAngle < 90) {
+                rightClosestToHorizonAnglePosition = 0;
+            }
+            if (rightEndAngle > 270) {
+                rightClosestToHorizonAnglePosition = chartBeans.size() - 1;
+            }
+        }
+
+        boolean isLeftHaveData = false;
+        int leftClosestToPosition = 0;
+        for (int i = 0; i < chartBeans.size(); i++) {
+            float mAngle = chartBeans.get(i).getStartAngle();
+            if (mAngle >= 90 && mAngle <= 270) {
+                float oldAngle = Math.abs(180 - chartBeans.get(leftClosestToPosition).getStartAngle());
+                float currentAngle = Math.abs(180 - mAngle);
+                leftClosestToPosition = oldAngle > currentAngle ? i : leftClosestToPosition;
+                isLeftHaveData = true;
+            }
+        }
+        if (isLeftHaveData) {
+            leftClosestToHorizonAnglePosition = leftClosestToPosition;
+        }
+
+        LineChartBean rightClosestToBean = null;
+        if (rightClosestToHorizonAnglePosition != -1) {
+            rightClosestToBean = chartBeans.get(rightClosestToHorizonAnglePosition);
+        }
+
+        LineChartBean leftClosestToBean = null;
+        if (leftClosestToHorizonAnglePosition != -1) {
+            leftClosestToBean = chartBeans.get(leftClosestToHorizonAnglePosition);
+        }
+
+        List<LineChartBean> rightBottomList = new ArrayList<>();
+        List<LineChartBean> leftBottomList = new ArrayList<>();
+        List<LineChartBean> leftTopList = new ArrayList<>();
+        List<LineChartBean> rightTopList = new ArrayList<>();
+
+        for (LineChartBean item : chartBeans) {
+            if (item.getStartAngle() < 90) {
+                rightBottomList.add(item);
+            } else if (item.getStartAngle() >= 90 && item.getStartAngle() < 180) {
+                leftBottomList.add(item);
+            } else if (item.getStartAngle() >= 180 && item.getStartAngle() <= 270) {
+                leftTopList.add(item);
+            } else if (item.getStartAngle() > 270) {
+                rightTopList.add(item);
+            }
+        }
+
+        float beforeY = 0;
+        float currentY;
+
+        //------------- 处理右下区域 -----------//
+        if (rightClosestToBean != null) {
+            beforeY = rightClosestToBean.getBendY();
+        }
+        int rightBottomListSize = rightBottomList.size();
+        for (int i = 0; i < rightBottomListSize; i++) {
+            LineChartBean item = rightBottomList.get(i);
+            currentY = item.getBendY();
+            if (chartBeans.get(rightClosestToHorizonAnglePosition).getBendY() != currentY) {
+                float offset = Math.abs(currentY - beforeY) - mTextSize;
+                if (offset < 10) {//10 表示两个title内容的间距
+                    currentY = currentY - (10 - offset);
+                    chartBeans.get(i).setBendY(currentY);
+                    chartBeans.get(i).setEndY(currentY);
+                }
+                beforeY = currentY;
+            }
+        }
+
+        //------------- 处理左下区域 -----------//
+        if (leftClosestToBean != null) {
+            beforeY = leftClosestToBean.getBendY();
+        }
+        int leftBottomListSize = leftBottomList.size();
+        for (int i = 0; i < leftBottomList.size(); i++) {//处理左下区域
+            int position = leftBottomListSize - 1 - i;
+            LineChartBean item = leftBottomList.get(position);
+            currentY = item.getBendY();
+            if (chartBeans.get(leftClosestToHorizonAnglePosition).getBendY() != currentY) {
+                float offset = Math.abs(currentY - beforeY) - mTextSize;
+                if (offset < 10) {//10 表示两个title内容的间距
+                    currentY = currentY - (10 - offset);
+                    chartBeans.get(rightBottomListSize + position).setBendY(currentY);
+                    chartBeans.get(rightBottomListSize + position).setEndY(currentY);
+                }
+                beforeY = currentY;
+            }
+        }
+
+        //------------- 处理左上区域 -----------//
+        if (leftClosestToBean != null) {
+            beforeY = leftClosestToBean.getBendY();
+        }
+        int leftTopListSize = leftBottomList.size();
+        for (int i = 0; i < leftTopListSize; i++) {//处理左上区域
+            LineChartBean item = leftBottomList.get(i);
+            currentY = item.getBendY();
+            if (chartBeans.get(leftClosestToHorizonAnglePosition).getBendY() != currentY) {
+                float offset = Math.abs(currentY - beforeY) - mTextSize;
+                if (offset < 10) {//10 表示两个title内容的间距
+                    currentY = currentY - (10 - offset);
+                    int position = rightBottomListSize + leftBottomListSize + i;
+                    chartBeans.get(position).setBendY(currentY);
+                    chartBeans.get(position).setEndY(currentY);
+                }
+                beforeY = currentY;
+            }
+        }
+
+        //-------------处理右上区域 -----------//
+        if (rightClosestToBean != null) {
+            beforeY = rightClosestToBean.getBendY();
+        }
+        int rightTopListSize = rightTopList.size();
+        for (int i = 0; i < rightTopListSize; i++) {//处理右上区域
+            int position = rightTopListSize - 1 - i;
+            LineChartBean item = rightTopList.get(position);
+            currentY = item.getBendY();
+            if (chartBeans.get(rightClosestToHorizonAnglePosition).getBendY() != currentY) {
+                float offset = Math.abs(currentY - beforeY) - mTextSize;
+                if (offset < 10) {//10 表示两个title内容的间距
+                    currentY = currentY - (10 - offset);
+                    chartBeans.get(rightBottomListSize + leftBottomListSize + leftTopListSize + position).setBendY(currentY);
+                    chartBeans.get(rightBottomListSize + leftBottomListSize + leftTopListSize + position + position).setEndY(currentY);
+                }
+                beforeY = currentY;
+            }
+        }
+    }
+
+    private void drawPieChart(@NonNull Canvas canvas) {
         canvas.save();//save()方法需要配合restore()方法使用
 
         mListPieChart = calculatePieChartDatas();//初始化数据
@@ -283,6 +453,7 @@ public class PieChartView extends View {
         canvas.restore();
     }
 
+    @NonNull
     private List<PieChartBean> calculatePieChartDatas() {
 
         List<PieChartBean> pieChartBeans = new ArrayList<>();
@@ -302,14 +473,14 @@ public class PieChartView extends View {
             SectorsData sectorsData = mListSector.get(i);
             float skewingLength;
             if (sectorsData.getProportion() == maxProportion) {
-                skewingLength = 30f;
+                skewingLength = mHighlightOffsetSize;
             } else {
-                skewingLength = 3f;
+                skewingLength = DEFAULT_HIGHLIGHT_OFFSET_SIZE;
             }
 
             itemStartAngle += itemSweepAngle;
             itemSweepAngle = sectorsData.getProportion() / totalCount * 360f;
-            PieChartBean chartBean = calculateDirectionCord(itemStartAngle, itemSweepAngle, skewingLength, DEFAULT_COLORS[i]);
+            PieChartBean chartBean = calculateDirectionCord(itemStartAngle, itemSweepAngle, skewingLength, mPieChartColor[i % mPieChartColor.length]);
             pieChartBeans.add(chartBean);
         }
 
@@ -319,6 +490,7 @@ public class PieChartView extends View {
     /**
      * 根据扇形角度计算扇形偏移方向及最终坐标
      */
+    @NonNull
     private PieChartBean calculateDirectionCord(float startAngle, float sweepAngle, float skewingLength, int color) {
         PieChartBean chartBean = new PieChartBean();
 
@@ -345,4 +517,35 @@ public class PieChartView extends View {
         return chartBean;
     }
 
+    public int[] getPieChartColor() {
+        return mPieChartColor;
+    }
+
+    public void setPieChartColor(int[] mPieChartColor) {
+        this.mPieChartColor = mPieChartColor;
+    }
+
+    public float getTextSize() {
+        return mTextSize;
+    }
+
+    public void setTextSize(float mTextSize) {
+        this.mTextSize = mTextSize;
+    }
+
+    public int getTextAndLineColor() {
+        return mTextAndLineColor;
+    }
+
+    public void setTextAndLineColor(int mTextAndLineColor) {
+        this.mTextAndLineColor = mTextAndLineColor;
+    }
+
+    public float getHighlightOffsetSize() {
+        return mHighlightOffsetSize;
+    }
+
+    public void setHighlightOffsetSize(float mHighlightOffsetSize) {
+        this.mHighlightOffsetSize = mHighlightOffsetSize;
+    }
 }

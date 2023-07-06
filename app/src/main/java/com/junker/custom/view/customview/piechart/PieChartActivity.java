@@ -7,14 +7,36 @@ import android.view.View;
 
 import com.junker.custom.view.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PieChartActivity extends AppCompatActivity {
+
+    private PieChartView mPieChartView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pie_chart);
 
-        PieChartView mPieChartView = findViewById(R.id.pie_chart_view);
+        mPieChartView = findViewById(R.id.pie_chart_view);
 
+        initData();
+    }
+
+    private void initData() {
+        List<SectorsData> mListSector = new ArrayList<>();
+        mListSector.add(new SectorsData("红队", 3f));
+        mListSector.add(new SectorsData("蓝队", 3f));
+        mListSector.add(new SectorsData("黑1队", 1f));
+        mListSector.add(new SectorsData("黄队", 300f));
+        mListSector.add(new SectorsData("绿1队", 3f));
+        mListSector.add(new SectorsData("绿2队", 3f));
+        mListSector.add(new SectorsData("绿3队", 300f));
+        mListSector.add(new SectorsData("紫队", 1f));
+        mListSector.add(new SectorsData("白队", 1f));
+        mListSector.add(new SectorsData("黑1队", 1f));
+
+        mPieChartView.initData(mListSector);
     }
 }
