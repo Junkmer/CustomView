@@ -61,6 +61,7 @@
     </declare-styleable>
     
     <declare-styleable name="PieChartView">
+        <attr name="radius" format="dimension"/>
         <attr name="tipTextSize" format="dimension"/>
         <attr name="textAndLineColor" format="color"/>
         <attr name="highlightOffsetSize" format="dimension"/>

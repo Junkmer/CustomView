@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +29,7 @@ import java.util.List;
  * @Description TODO：绘制一个扇形统计图，主要有三部分需要绘制：1.扇形图 、2.折线 、3.文本提示
  */
 public class PieChartView extends View {
+    private final static int DEFAULT_TOTAL_PIE_CHART_ANGLE = 360;
     private final static int DEFAULT_HEIGHT_SIZE = 500;
     private final static int DEFAULT_TEXT_SIZE = DensityUtil.dip2px(13);
     private final static int DEFAULT_HIGHLIGHT_OFFSET_SIZE = 3;
@@ -48,7 +50,7 @@ public class PieChartView extends View {
     private final int widthPixels;
     private int centerX;
     private int centerY;
-    private int mRadius;
+    private float mRadius;
     private Paint mPiePaint;
     private List<SectorsData> mListSector = new ArrayList<>();
 
@@ -56,6 +58,8 @@ public class PieChartView extends View {
     private float mTextSize;
     private int mTextAndLineColor;
     private float mHighlightOffsetSize;
+    public float mTotalPieChartAngle;
+//    private float mPieChartRadius;
 
     public PieChartView(Context context) {
         this(context, null);
@@ -79,6 +83,7 @@ public class PieChartView extends View {
 
     private void initAttr(@NonNull Context context, @Nullable AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PieChartView);
+        mRadius = a.getDimension(R.styleable.PieChartView_radius,-1);
         mTextSize = a.getDimension(R.styleable.PieChartView_tipTextSize, DEFAULT_TEXT_SIZE);
         mTextAndLineColor = a.getColor(R.styleable.PieChartView_textAndLineColor, getResources().getColor(R.color.black));
         mHighlightOffsetSize = a.getDimension(R.styleable.PieChartView_highlightOffsetSize, DEFAULT_HIGHLIGHT_OFFSET_SIZE);
@@ -132,7 +137,9 @@ public class PieChartView extends View {
         }
         mListSector = mList;
 //        Collections.sort(mListSector);
-        invalidate();//刷新view
+
+        initAnim(DEFAULT_TOTAL_PIE_CHART_ANGLE);
+//        invalidate();//刷新view
     }
 
     public void addData(SectorsData mData) {
@@ -159,7 +166,9 @@ public class PieChartView extends View {
         int mHeight = getMeasuredHeight();
         centerX = mWidth / 2;
         centerY = mHeight / 2;
-        mRadius = (int) (Math.min(centerX, centerY) * 0.80f);
+        if (mRadius == -1){
+            mRadius = (int) (Math.min(centerX, centerY) * 0.80f);
+        }
     }
 
     private void initPaint() {
@@ -450,6 +459,7 @@ public class PieChartView extends View {
             mPiePaint.setColor(bean.getColor());
             canvas.drawArc(bean.getLeft(), bean.getTop(), bean.getRight(), bean.getBottom(),
                     bean.getStartAngle(), bean.getSweepAngle(), true, mPiePaint);
+
         }
 
         canvas.restore();
@@ -481,13 +491,24 @@ public class PieChartView extends View {
             }
 
             itemStartAngle += itemSweepAngle;
-            itemSweepAngle = sectorsData.getProportion() / totalCount * 360f;
+            itemSweepAngle = sectorsData.getProportion() / totalCount * mTotalPieChartAngle;
             PieChartBean chartBean = calculateDirectionCord(itemStartAngle, itemSweepAngle, skewingLength, mPieChartColor[i % mPieChartColor.length]);
             pieChartBeans.add(chartBean);
         }
 
         return pieChartBeans;
     }
+
+    CustomAnimation customAnimation;
+
+    public void initAnim(float total){
+        customAnimation = new CustomAnimation(this,total);
+        customAnimation.setDuration(1);
+        customAnimation.setFillAfter(true);
+        customAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+        startAnimation(customAnimation);
+    }
+
 
     /**
      * 根据扇形角度计算扇形偏移方向及最终坐标

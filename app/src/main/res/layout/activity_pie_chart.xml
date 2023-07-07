@@ -16,6 +16,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tipTextSize="13dp"/>
+        app:radius="70dp"
+        app:tipTextSize="10dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
