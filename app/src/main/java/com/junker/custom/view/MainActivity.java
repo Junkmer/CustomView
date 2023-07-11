@@ -27,6 +27,7 @@ import com.junker.custom.view.customview.keypad.KeypadActivity;
 import com.junker.custom.view.customview.loginpage.LoginActivity;
 import com.junker.custom.view.customview.move.TestMoveActivity;
 import com.junker.custom.view.customview.numberinput.NumberInputActivity;
+import com.junker.custom.view.customview.piechart.PieChartActivity;
 import com.junker.custom.view.customview.rebound.JunkerReboundActivity;
 import com.junker.custom.view.customview.rebound.ReboundActivity;
 import com.junker.custom.view.customview.rebound.ScrollReboundActivity;
@@ -90,6 +91,9 @@ public class MainActivity extends AppCompatActivity {
                     case 10:
                         intent = new Intent(MainActivity.this, WatchFaceActivity.class);
                         break;
+                    case 11:
+                        intent = new Intent(MainActivity.this, PieChartActivity.class);
+                        break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + titles.get(position));
                 }
@@ -110,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         titles.add(new ActivityBean(8, "继承ViewGroup实现的Keypad", KeypadActivity.class));
         titles.add(new ActivityBean(9, "继承ViewGroup实现的SlideMenu", KeypadActivity.class));
         titles.add(new ActivityBean(10, "继承View实现的WatchFace", WatchFaceActivity.class));
+        titles.add(new ActivityBean(11, "继承View实现的PieChart", PieChartActivity.class));
     }
 
     private void initAdapter() {
