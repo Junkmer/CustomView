@@ -1,5 +1,6 @@
 package com.junker.custom.view.customview.piechart;
 
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
@@ -14,9 +15,9 @@ import java.util.List;
  * @Description TODO
  */
 public class CustomAnimation extends Animation {
-    private PieChartView view;
-    private List<SectorsData> viewBeanList;
-    private float total;//总金额，需要传递过来
+    private static final String TAG = CustomAnimation.class.getSimpleName();
+    private final View view;
+    private final float total;
 
     public CustomAnimation(PieChartView view, float total) {
         this.view = view;
@@ -27,9 +28,11 @@ public class CustomAnimation extends Animation {
     protected void applyTransformation(float interpolatedTime, Transformation t) {
         super.applyTransformation(interpolatedTime, t);
         if (interpolatedTime <= 1.0f) {
-            view.mTotalPieChartAngle = total * interpolatedTime;
+            if (view instanceof PieChartView) {
+                ((PieChartView) view).mTotalPieChartAngle = total * interpolatedTime;
+            }
             //重新绘制
-            view.postInvalidate();
+            view.invalidate();
         }
     }
 }

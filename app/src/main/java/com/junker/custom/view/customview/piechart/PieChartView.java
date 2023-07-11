@@ -33,6 +33,7 @@ public class PieChartView extends View {
     private final static int DEFAULT_HEIGHT_SIZE = 500;
     private final static int DEFAULT_TEXT_SIZE = DensityUtil.dip2px(13);
     private final static int DEFAULT_HIGHLIGHT_OFFSET_SIZE = 3;
+    private final static int DEFAULT_ANIMATION_DURATION = 800;
     private static final String TAG = PieChartActivity.class.getSimpleName();
 
     private final static int[] DEFAULT_COLORS = new int[]
@@ -59,7 +60,7 @@ public class PieChartView extends View {
     private int mTextAndLineColor;
     private float mHighlightOffsetSize;
     public float mTotalPieChartAngle;
-//    private float mPieChartRadius;
+    private int mDuration;
 
     public PieChartView(Context context) {
         this(context, null);
@@ -87,7 +88,7 @@ public class PieChartView extends View {
         mTextSize = a.getDimension(R.styleable.PieChartView_tipTextSize, DEFAULT_TEXT_SIZE);
         mTextAndLineColor = a.getColor(R.styleable.PieChartView_textAndLineColor, getResources().getColor(R.color.black));
         mHighlightOffsetSize = a.getDimension(R.styleable.PieChartView_highlightOffsetSize, DEFAULT_HIGHLIGHT_OFFSET_SIZE);
-
+        mDuration = a.getInteger(R.styleable.PieChartView_animationDuration,DEFAULT_ANIMATION_DURATION);
         a.recycle();
     }
 
@@ -125,7 +126,6 @@ public class PieChartView extends View {
         setMeasuredDimension(contentMeasureWidth, contentMeasureHeight);
 
         initImportantParam();
-
     }
 
     /**
@@ -136,10 +136,8 @@ public class PieChartView extends View {
             throw new IllegalArgumentException("mList parameter in the initData method cannot be empty.");
         }
         mListSector = mList;
-//        Collections.sort(mListSector);
 
         initAnim(DEFAULT_TOTAL_PIE_CHART_ANGLE);
-//        invalidate();//刷新view
     }
 
     public void addData(SectorsData mData) {
@@ -182,12 +180,15 @@ public class PieChartView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        Log.e(TAG, "onDraw > 绘制自定义视图");
         //绘制扇形图
         drawPieChart(canvas);
-        //绘制折线
-        drawLine(canvas);
-        //绘制文本
-        drawText(canvas);
+        if (mTotalPieChartAngle == DEFAULT_TOTAL_PIE_CHART_ANGLE){
+            //绘制折线
+            drawLine(canvas);
+            //绘制文本
+            drawText(canvas);
+        }
     }
 
     private void drawText(@NonNull Canvas canvas) {
@@ -499,17 +500,6 @@ public class PieChartView extends View {
         return pieChartBeans;
     }
 
-    CustomAnimation customAnimation;
-
-    public void initAnim(float total){
-        customAnimation = new CustomAnimation(this,total);
-        customAnimation.setDuration(1);
-        customAnimation.setFillAfter(true);
-        customAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-        startAnimation(customAnimation);
-    }
-
-
     /**
      * 根据扇形角度计算扇形偏移方向及最终坐标
      */
@@ -538,6 +528,15 @@ public class PieChartView extends View {
         chartBean.setCenterY(centerY + skewingY);
 
         return chartBean;
+    }
+
+    public void initAnim(float total){
+        //加载动画
+        CustomAnimation customAnimation = new CustomAnimation(this, total);
+        customAnimation.setDuration(mDuration);
+        customAnimation.setFillAfter(true);
+        customAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+        startAnimation(customAnimation);
     }
 
     public int[] getPieChartColor() {
